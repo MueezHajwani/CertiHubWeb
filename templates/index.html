@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>CertiHub Web</title>
+    <style>
+      * {
+        font-family: Orbitron;
+      }
+      body {
+        background: #112e42;
+        color: white;
+        text-align: center;
+      }
+
+      h1 {
+        background: linear-gradient(135deg, #1ec1cb, #00a8ff, #8e44ad);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        font-size: 3.5rem;
+        font-weight: bold;
+        text-shadow: 0 4px 8px rgba(30, 193, 203, 0.3);
+        letter-spacing: 3px;
+        margin: 20px 0;
+        position: relative;
+      }
+
+      h1::after {
+        content: "";
+        position: absolute;
+        bottom: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 200px;
+        height: 3px;
+        background: linear-gradient(90deg, #1ec1cb, #00a8ff);
+        border-radius: 2px;
+        box-shadow: 0 2px 10px rgba(30, 193, 203, 0.5);
+      }
+
+      h3 {
+        font-size: 2.5rem;
+      }
+
+      #template-upload-container {
+        height: 50px;
+        margin-bottom: 10px;
+      }
+      #template-upload-btn {
+        padding: 10px 20px;
+        font-size: 16px;
+        width: 200px;
+        background: linear-gradient(135deg, #1ec1cb, #00a8ff);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(30, 193, 203, 0.3);
+        position: relative;
+        overflow: hidden;
+      }
+
+      #template-upload-btn::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 255, 255, 0.2),
+          transparent
+        );
+        transition: left 0.5s ease;
+      }
+
+      #template-upload-btn:hover {
+        box-shadow: 0 8px 25px rgba(30, 193, 203, 0.5);
+        background: linear-gradient(135deg, #00a8ff, #8e44ad);
+      }
+
+      #template-upload-btn:hover::before {
+        left: 100%;
+      }
+
+      #template-upload-btn:active {
+        transform: translateY(0);
+        box-shadow: 0 4px 15px rgba(30, 193, 203, 0.3);
+      }
+
+      #template-upload {
+        display: none;
+      }
+      #canvas-container {
+        position: relative;
+        display: inline-block;
+        margin-top: 10px;
+      }
+      #template-canvas {
+        background: #2b2b2b;
+        border: 2px solid white;
+      }
+      #instruction-label {
+        margin-top: 10px;
+        font-size: 16px;
+        color: #ddd;
+      }
+      #button-container {
+        margin-top: 20px;
+        text-align: center;
+      }
+      #next-btn,
+      #back-btn,
+      #file-upload-btn {
+        display: none;
+        margin: 0 10px;
+        padding: 10px 20px;
+        font-size: 16px;
+        width: 200px;
+        background: linear-gradient(135deg, #1ec1cb, #00a8ff);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(30, 193, 203, 0.3);
+        position: relative;
+        overflow: hidden;
+      }
+
+      #next-btn::before,
+      #back-btn::before,
+      #file-upload-btn::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 255, 255, 0.2),
+          transparent
+        );
+        transition: left 0.5s ease;
+      }
+
+      #next-btn:hover,
+      #back-btn:hover,
+      #file-upload-btn:hover {
+        box-shadow: 0 8px 25px rgba(30, 193, 203, 0.5);
+        background: linear-gradient(135deg, #00a8ff, #8e44ad);
+      }
+
+      #next-btn:hover::before,
+      #back-btn:hover::before,
+      #file-upload-btn:hover::before {
+        left: 100%;
+      }
+
+      #next-btn:active,
+      #back-btn:active,
+      #file-upload-btn:active {
+        transform: translateY(0);
+        box-shadow: 0 4px 15px rgba(30, 193, 203, 0.3);
+      }
+
+      #settings {
+        display: none;
+        position: absolute;
+        left: -280px;
+        top: -15px;
+        width: 220px;
+        background: ##112e42;
+        padding: 10px;
+        border: 1px solid #112e42;
+        text-align: center;
+      }
+      #settings label {
+        display: block;
+        margin-top: 10px;
+        font-size: 14px;
+      }
+      #settings select,
+      #settings input {
+        background: lightgray;
+        width: 100%;
+        margin-top: 5px;
+        border-radius: 8px;
+        padding: 5px;
+        font-size: 14px;
+      }
+      #settings h3 {
+        margin-bottom: 10px;
+      }
+      .loading {
+        opacity: 0.6;
+        pointer-events: none;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>CertiHub Web</h1>
+    <div id="template-upload-container">
+      <button id="template-upload-btn">Choose Template</button>
+      <input
+        type="file"
+        id="template-upload"
+        accept=".png,.jpg,.jpeg"
+        style="display: none"
+      />
+    </div>
+
+    <div id="canvas-container">
+      <canvas id="template-canvas" width="900" height="550"></canvas>
+
+      <!-- Sidebar for Step 2 -->
+      <div id="settings">
+        <h3>Font Settings</h3>
+        <label for="font-style">Font Style:</label>
+        <select id="font-style">
+          <option value="arial.ttf">Arial (Default)</option>
+          <option value="Certihub web\fonts\Anton.ttf">Anton</option>
+          <option value="Certihub web\fonts\Arimo.ttf">Arimo</option>
+          <option value="Certihub web\fonts\Ballet.ttf">Ballet</option>
+          <option value="Certihub web\fonts\Bebas Neue.ttf">Bebas Neue</option>
+          <option value="Certihub web\fonts\Cabin.ttf">Cabin</option>
+          <option value="Certihub web\fonts\DM Sans.ttf">DM Sans</option>
+          <option value="Certihub web\fonts\Fira Sans.ttf">Fira Sans</option>
+          <option value="Certihub web\fonts\Gothic A1.ttf">Gothic A1</option>
+          <option value="Certihub web\fonts\Heebo.ttf">Heebo</option>
+          <option value="Certihub web\fonts\Inter.ttf">Inter</option>
+          <option value="Certihub web\fonts\Josefin Sans.ttf">
+            Josefin Sans
+          </option>
+          <option value="Certihub web\fonts\Karla.ttf">Karla</option>
+          <option value="Certihub web\fonts\Lato-Regular.ttf">
+            Lato Regular
+          </option>
+          <option value="Certihub web\fonts\Lato.ttf">Lato</option>
+          <option value="Certihub web\fonts\Libre Baskerville.ttf">
+            Libre Baskerville
+          </option>
+          <option value="Certihub web\fonts\Merriweather-Italic[opsz,wght].ttf">
+            Merriweather Italic
+          </option>
+          <option value="Certihub web\fonts\Montserrat.ttf">Montserrat</option>
+          <option value="Certihub web\fonts\Mukta.ttf">Mukta</option>
+          <option value="Certihub web\fonts\Noto Sans.ttf">Noto Sans</option>
+          <option value="Certihub web\fonts\Nunito.ttf">Nunito</option>
+          <option value="Certihub web\fonts\Open Sans.ttf">Open Sans</option>
+          <option value="Certihub web\fonts\Orbitron-VariableFont_wght.ttf">
+            Orbitron Variable
+          </option>
+          <option value="Certihub web\fonts\Oswald.ttf">Oswald</option>
+          <option value="Certihub web\fonts\Playfair Display.ttf">
+            Playfair Display
+          </option>
+          <option value="Certihub web\fonts\Poppins.ttf">Poppins</option>
+          <option value="Certihub web\fonts\PT Sans.ttf">PT Sans</option>
+          <option value="Certihub web\fonts\Raleway.ttf">Raleway</option>
+          <option value="Certihub web\fonts\Roboto Slab.ttf">
+            Roboto Slab
+          </option>
+          <option value="Certihub web\fonts\Roboto.ttf">Roboto</option>
+          <option value="Certihub web\fonts\Ubuntu.ttf">Ubuntu</option>
+          <option value="Certihub web\fonts\Work Sans.ttf">Work Sans</option>
+        </select>
+        <label for="font-size">Font Size:</label>
+        <select id="font-size"></select>
+        <label for="font-color">Font Color:</label>
+        <input type="color" id="font-color" value="#000000" />
+      </div>
+    </div>
+
+    <div id="instruction-label">
+      Please upload a template and drag to select where names will be printed.
+    </div>
+
+    <div id="button-container">
+      <button id="next-btn">Next</button>
+      <button id="file-upload-btn">Select File</button>
+      <input
+        type="file"
+        id="names-file"
+        accept=".txt,.pdf,.xlsx"
+        style="display: none"
+      />
+      <button id="back-btn">Back</button>
+    </div>
+
+    <script>
+      const uploadInput = document.getElementById("template-upload");
+      const uploadBtn = document.getElementById("template-upload-btn");
+      const canvas = document.getElementById("template-canvas");
+      const ctx = canvas.getContext("2d");
+      const nextBtn = document.getElementById("next-btn");
+      const backBtn = document.getElementById("back-btn");
+      const instructionLabel = document.getElementById("instruction-label");
+      const settingsDiv = document.getElementById("settings");
+      const fontStyleSelect = document.getElementById("font-style");
+      const fontSizeSelect = document.getElementById("font-size");
+      const fontColorInput = document.getElementById("font-color");
+      const fileUploadBtn = document.getElementById("file-upload-btn");
+      const namesFileInput = document.getElementById("names-file");
+
+      let img = new Image();
+      let isDragging = false;
+      let step2Active = false;
+      let startX, startY, endX, endY;
+
+      // Populate font size options
+      for (let i = 1; i <= 120; i++) {
+        const option = document.createElement("option");
+        option.value = i;
+        option.textContent = i;
+        if (i === 40) option.selected = true;
+        fontSizeSelect.appendChild(option);
+      }
+
+      // Connect custom button to file input
+      uploadBtn.addEventListener("click", () => uploadInput.click());
+
+      uploadInput.addEventListener("change", (e) => {
+        canvas.style.cursor = "crosshair";
+        const file = e.target.files[0];
+        if (!file) return;
+        if (!file) {
+          canvas.style.cursor = "default";
+        }
+        const reader = new FileReader();
+        reader.onload = function (event) {
+          img.onload = function () {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(img, 0, 0, 900, 550);
+          };
+          img.src = event.target.result;
+        };
+        reader.readAsDataURL(file);
+      });
+
+      canvas.addEventListener("mousedown", (e) => {
+        if (!img.src) return;
+        isDragging = true;
+        const rect = canvas.getBoundingClientRect();
+        startX = e.clientX - rect.left;
+        startY = e.clientY - rect.top;
+        if (!step2Active) {
+          uploadInput.style.visibility = "hidden";
+          instructionLabel.style.display = "none";
+          uploadBtn.style.visibility = "hidden";
+        }
+      });
+
+      canvas.addEventListener("mousemove", (e) => {
+        if (!isDragging) return;
+        const rect = canvas.getBoundingClientRect();
+        endX = e.clientX - rect.left;
+        endY = e.clientY - rect.top;
+        redrawCanvas();
+      });
+
+      canvas.addEventListener("mouseup", (e) => {
+        if (!isDragging) return;
+        isDragging = false;
+        drawNameText();
+        if (!step2Active) {
+          nextBtn.style.display = "inline-block";
+          backBtn.style.display = "inline-block";
+        }
+      });
+
+      function redrawCanvas() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0, 900, 550);
+        ctx.strokeStyle = "red";
+        ctx.lineWidth = 2;
+        ctx.setLineDash([6]);
+        ctx.strokeRect(startX, startY, endX - startX, endY - startY);
+      }
+
+      function drawNameText() {
+        if (!startX || !endX) return;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0, 900, 550);
+        ctx.strokeStyle = "red";
+        ctx.setLineDash([6]);
+        ctx.strokeRect(startX, startY, endX - startX, endY - startY);
+        const centerX = (startX + endX) / 2;
+        const centerY = (startY + endY) / 2;
+
+        // Get selected font family from the font style dropdown
+        const selectedFont =
+          fontStyleSelect.options[fontStyleSelect.selectedIndex].text;
+        const fontFamily = selectedFont.includes("(Default)")
+          ? "Arial"
+          : selectedFont;
+
+        ctx.font = `${fontSizeSelect.value}px ${fontFamily}`;
+        ctx.fillStyle = fontColorInput.value;
+        ctx.textAlign = "center";
+        ctx.setLineDash([]);
+        ctx.fillText("Your Name", centerX, centerY);
+      }
+
+      nextBtn.addEventListener("click", () => {
+        settingsDiv.style.display = "block";
+        nextBtn.style.display = "none";
+        fileUploadBtn.style.display = "inline-block";
+        step2Active = true;
+      });
+
+      backBtn.addEventListener("click", resetToStep1);
+
+      function resetToStep1() {
+        settingsDiv.style.display = "none";
+        nextBtn.style.display = "none";
+        backBtn.style.display = "none";
+        fileUploadBtn.style.display = "none";
+        uploadInput.style.visibility = "visible";
+        instructionLabel.style.display = "block";
+        uploadBtn.style.visibility = "visible";
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        img = new Image();
+        uploadInput.value = "";
+        // Reset names file input
+        namesFileInput.value = "";
+        step2Active = false;
+      }
+
+      // Add event listeners for font settings changes
+      fontStyleSelect.addEventListener("change", drawNameText);
+      fontSizeSelect.addEventListener("change", drawNameText);
+      fontColorInput.addEventListener("change", drawNameText);
+      fileUploadBtn.addEventListener("click", () => namesFileInput.click());
+
+      namesFileInput.addEventListener("change", async () => {
+        if (namesFileInput.files.length === 0) return;
+        if (uploadInput.files.length === 0) {
+          alert("Please upload a template first!");
+          return;
+        }
+
+        // Show loading state
+        fileUploadBtn.textContent = "Generating...";
+        fileUploadBtn.classList.add("loading");
+
+        try {
+          const formData = new FormData();
+
+          // Get fresh file references
+          const templateFile = uploadInput.files[0];
+          const namesFile = namesFileInput.files[0];
+
+          // Validate files exist
+          if (!templateFile || !namesFile) {
+            alert("Please ensure both template and names file are selected!");
+            return;
+          }
+
+          formData.append("template", templateFile);
+          formData.append("names", namesFile);
+          formData.append("font_style", fontStyleSelect.value);
+          formData.append("font_size", fontSizeSelect.value);
+          formData.append("font_color", fontColorInput.value);
+          formData.append("coords", [startX, startY, endX, endY].join(","));
+
+          const response = await fetch("/generate", {
+            method: "POST",
+            body: formData,
+          });
+
+          if (!response.ok) {
+            throw new Error(`Server error: ${response.status}`);
+          }
+
+          const blob = await response.blob();
+          const link = document.createElement("a");
+          link.href = URL.createObjectURL(blob);
+          link.download = "Generated_Certificates.pdf";
+          link.click();
+
+          // Reset names file for next use
+          namesFileInput.value = "";
+        } catch (error) {
+          console.error("Error generating PDF:", error);
+          alert("Error generating PDF. Please try again.");
+        } finally {
+          // Reset button state
+          fileUploadBtn.textContent = "Select File";
+          fileUploadBtn.classList.remove("loading");
+        }
+      });
+    </script>
+  </body>
+</html>
