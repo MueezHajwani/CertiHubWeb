@@ -4,8 +4,12 @@ from pypdf import PdfReader
 import pandas as pd
 import io, os
 
-app = Flask(__name__)
-FONTS_DIR = os.path.join(app.static_folder, "fonts")   # static/fonts/
+# IMPORTANT: Configure paths for Vercel
+app = Flask(__name__, 
+            static_folder='../static', 
+            template_folder='../templates')
+
+FONTS_DIR = os.path.join(os.path.dirname(__file__), '..', 'static', 'fonts')
 
 def hex_to_rgb(code):
     code = code.lstrip("#")
@@ -35,7 +39,7 @@ def generate():
     try:
         tpl_f    = request.files["template"]
         names_f  = request.files["names"]
-        fname    = request.form["font_style"]           # e.g. Anton.ttf
+        fname    = request.form["font_style"]
         fsize    = int(request.form["font_size"])
         fcolor   = hex_to_rgb(request.form["font_color"])
         sx,sy,ex,ey = map(float, request.form["coords"].split(","))
@@ -67,9 +71,4 @@ def generate():
     except Exception as e:
         return Response(f"Error: {e}", 500)
 
-# Remove these lines if they exist:
-# if __name__ == '__main__':
-#     app.run(debug=True)
-
-# Keep only this at the end:
-app = Flask(__name__, static_folder='../static', template_folder='../templates')
+# REMOVE any if __name__ == '__main__' block completely
