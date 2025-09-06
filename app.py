@@ -1,117 +1,71 @@
-from flask import Flask, render_template, request, send_file, Response
+from flask import Flask, render_template, request, Response
 from PIL import Image, ImageDraw, ImageFont
-from pandas import read_excel
 from pypdf import PdfReader
-import io
-import os
+import pandas as pd
+import io, os
 
 app = Flask(__name__)
+FONTS_DIR = os.path.join(app.static_folder, "fonts")   # static/fonts/
 
-def hex_to_rgb(hex_color):
-    hex_color = hex_color.lstrip('#')
-    return tuple(int(hex_color[i:i+2], 16) for i in (0, 2, 4))
+def hex_to_rgb(code):
+    code = code.lstrip("#")
+    return tuple(int(code[i:i+2], 16) for i in (0, 2, 4))
 
-@app.route('/')
+def read_names(fs):
+    data = fs.read(); names = []
+    if fs.filename.endswith(".txt"):
+        names = [ln.strip() for ln in data.decode("utf-8").splitlines() if ln.strip()]
+    elif fs.filename.endswith(".xlsx"):
+        df = pd.read_excel(io.BytesIO(data), header=None)
+        for col in df.columns:
+            names += [str(v).strip() for v in df[col] if str(v).strip().lower() != "nan"]
+    elif fs.filename.endswith(".pdf"):
+        rdr = PdfReader(io.BytesIO(data))
+        for p in rdr.pages:
+            if (txt := p.extract_text()):
+                names += [ln.strip() for ln in txt.splitlines() if ln.strip()]
+    return names
+
+@app.route("/")
 def index():
-    return render_template('index.html')
+    return render_template("index.html")
 
-@app.route('/generate', methods=['POST'])
+@app.route("/generate", methods=["POST"])
 def generate():
     try:
-        # Get template & names file
-        template_file = request.files['template']
-        names_file = request.files['names']
-        font_style = request.form['font_style']
-        font_size = int(request.form['font_size'])
-        font_color = hex_to_rgb(request.form['font_color'])
-        coords = request.form['coords'].split(',')
-        start_x, start_y, end_x, end_y = map(float, coords)
+        tpl_f    = request.files["template"]
+        names_f  = request.files["names"]
+        fname    = request.form["font_style"]           # e.g. Anton.ttf
+        fsize    = int(request.form["font_size"])
+        fcolor   = hex_to_rgb(request.form["font_color"])
+        sx,sy,ex,ey = map(float, request.form["coords"].split(","))
 
-        # Load template & original size - use BytesIO to avoid file pointer issues
-        template_data = io.BytesIO(template_file.read())
-        template = Image.open(template_data).convert("RGB")
-        orig_w, orig_h = template.size
+        tpl = Image.open(io.BytesIO(tpl_f.read())).convert("RGB")
+        ow,oh = tpl.size
+        cx,cy = ((sx+ex)/2)*(ow/900), ((sy+ey)/2)*(oh/550)
 
-        # Calculate scaled position based on 900x550 preview
-        scale_x = orig_w / 900
-        scale_y = orig_h / 550
-        center_x = ((start_x + end_x) / 2) * scale_x
-        center_y = ((start_y + end_y) / 2) * scale_y
-
-        # Extract names - use BytesIO to avoid file pointer issues
-        names = []
-        names_data = names_file.read()
-        
-        if names_file.filename.endswith(".txt"):
-            for line in names_data.decode("utf-8").splitlines():
-                if line.strip():
-                    names.append(line.strip())
-        elif names_file.filename.endswith(".xlsx"):
-            names_file_io = io.BytesIO(names_data)
-            df = read_excel(names_file_io, header=None)
-            for col in df.columns:
-                for val in df[col]:
-                    if str(val).strip().lower() != 'nan':
-                        names.append(str(val).strip())
-        elif names_file.filename.endswith(".pdf"):
-            names_file_io = io.BytesIO(names_data)
-            reader = PdfReader(names_file_io)
-            for page in reader.pages:
-                text = page.extract_text()
-                if text:
-                    for line in text.splitlines():
-                        if line.strip():
-                            names.append(line.strip())
-
+        names = read_names(names_f)
         if not names:
-            return Response("No names found in the uploaded file", status=400)
+            return Response("No names found", 400)
 
-        # Load the selected font
         try:
-            if font_style == "arial.ttf":
-                font = ImageFont.truetype("arial.ttf", font_size)
-            else:
-                font_path = font_style
-                if os.path.exists(font_path):
-                    font = ImageFont.truetype(font_path, font_size)
-                else:
-                    print(f"Font file not found: {font_path}, using default Arial")
-                    font = ImageFont.truetype("arial.ttf", font_size)
+            font = ImageFont.truetype(os.path.join(FONTS_DIR, fname), fsize)
         except OSError:
-            print(f"Failed to load font: {font_style}, using default Arial")
-            font = ImageFont.load_default()
+            font = ImageFont.truetype(os.path.join(FONTS_DIR, "arial.ttf"), fsize)
 
-        # Draw each certificate & collect in list
-        images = []
-        for name in names:
-            cert = template.copy()
-            draw = ImageDraw.Draw(cert)
-            draw.text((center_x, center_y), name, font=font, fill=font_color, anchor="mm")
-            images.append(cert)
+        pages=[]
+        for n in names:
+            img=tpl.copy()
+            ImageDraw.Draw(img).text((cx,cy), n, font=font, fill=fcolor, anchor="mm")
+            pages.append(img)
 
-        if not images:
-            return Response("No certificates generated", status=400)
-
-        # Save as merged PDF
-        pdf_bytes = io.BytesIO()
-        images[0].save(pdf_bytes, format="PDF", save_all=True, append_images=images[1:])
-        pdf_bytes.seek(0)
-
-        # Force Save As dialog
-        return Response(
-            pdf_bytes.getvalue(),
-            mimetype="application/pdf",
-            headers={
-                "Content-Disposition": "attachment; filename=Generated_Certificates.pdf",
-                "Cache-Control": "no-cache, no-store, must-revalidate",
-                "Pragma": "no-cache",
-                "Expires": "0"
-            }
-        )
-        
+        pdf=io.BytesIO()
+        pages[0].save(pdf, format="PDF", save_all=True, append_images=pages[1:])
+        pdf.seek(0)
+        return Response(pdf.getvalue(), mimetype="application/pdf",
+                        headers={"Content-Disposition":"attachment; filename=Certificates.pdf"})
     except Exception as e:
-        print(f"Error generating certificates: {str(e)}")
-        return Response(f"Error generating certificates: {str(e)}", status=500)
+        return Response(f"Error: {e}", 500)
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     app.run(debug=True)
