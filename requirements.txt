@@ -1,0 +1,4 @@
+Flask==2.3.3
+pypdf==4.1.0        # PDF reading
+Pillow==10.3.0      # image + font handling
+pandas==2.2.2       # Excel parsing
