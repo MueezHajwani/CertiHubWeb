@@ -67,5 +67,9 @@ def generate():
     except Exception as e:
         return Response(f"Error: {e}", 500)
 
-if __name__ == "__main__":
-    app.run(debug=True)
+# Remove these lines if they exist:
+# if __name__ == '__main__':
+#     app.run(debug=True)
+
+# Keep only this at the end:
+app = Flask(__name__, static_folder='../static', template_folder='../templates')
