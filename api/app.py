@@ -13,7 +13,6 @@ FONTS_DIR = os.path.join(os.path.dirname(__file__), '..', 'static', 'fonts')
 
 # Font mapping from Google Font names to local TTF files
 FONT_MAP = {
-    "Arial": "arial.ttf",
     "Anton": "Anton.ttf",
     "Arimo": "Arimo.ttf",
     "Orbitron": "Orbitron-VariableFont_wght.ttf",
