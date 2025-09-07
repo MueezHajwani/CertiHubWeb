@@ -54,7 +54,7 @@ def read_names(fs):
     if fs.filename.endswith(".txt"):
         names = [ln.strip() for ln in data.decode("utf-8").splitlines() if ln.strip()]
     elif fs.filename.endswith(".xlsx"):
-        df = pd.read_excel(io.BytesIO(data), header=None)
+        df = pd.read_excel(io.BytesIO(data), header=None, engine='openpyxl')  # Add engine='openpyxl'
         for col in df.columns:
             names += [str(v).strip() for v in df[col] if str(v).strip().lower() != "nan"]
     elif fs.filename.endswith(".pdf"):
@@ -63,6 +63,7 @@ def read_names(fs):
             if (txt := p.extract_text()):
                 names += [ln.strip() for ln in txt.splitlines() if ln.strip()]
     return names
+
 
 def get_font(font_name, font_size):
     """Get PIL font object from Google Font name"""
