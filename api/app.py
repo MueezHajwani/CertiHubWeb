@@ -34,6 +34,35 @@ def read_names(fs):
 def index():
     return render_template("index.html")
 
+# Add this debug route to test font access
+@app.route('/test-fonts')
+def test_fonts():
+    """Test route to check if fonts are accessible"""
+    font_files = []
+    try:
+        for filename in os.listdir(FONTS_DIR):
+            if filename.endswith('.ttf'):
+                font_files.append(f'/static/fonts/{filename}')
+        return f"<h2>Found {len(font_files)} fonts:</h2><ul>" + "".join([f"<li><a href='{font}' target='_blank'>{font}</a></li>" for font in sorted(font_files)]) + "</ul>"
+    except Exception as e:
+        return f"<h2>Error accessing fonts directory:</h2><p>{str(e)}</p><p>FONTS_DIR path: {FONTS_DIR}</p>"
+
+# Add this route to serve fonts directly (backup method)
+@app.route('/fonts/<filename>')
+def serve_font(filename):
+    """Direct font serving route as backup"""
+    try:
+        font_path = os.path.join(FONTS_DIR, filename)
+        if os.path.exists(font_path) and filename.endswith('.ttf'):
+            with open(font_path, 'rb') as f:
+                font_data = f.read()
+            return Response(font_data, mimetype='font/ttf', 
+                          headers={'Cache-Control': 'public, max-age=31536000'})
+        else:
+            return Response("Font not found", 404)
+    except Exception as e:
+        return Response(f"Error serving font: {e}", 500)
+
 @app.route("/generate", methods=["POST"])
 def generate():
     try:
@@ -55,7 +84,19 @@ def generate():
         try:
             font = ImageFont.truetype(os.path.join(FONTS_DIR, fname), fsize)
         except OSError:
-            font = ImageFont.truetype(os.path.join(FONTS_DIR, "arial.ttf"), fsize)
+            # Fallback fonts in order of preference
+            fallback_fonts = ["arial.ttf", "Arial.ttf", "Anton.ttf", "Poppins.ttf"]
+            font = None
+            for fallback in fallback_fonts:
+                try:
+                    font = ImageFont.truetype(os.path.join(FONTS_DIR, fallback), fsize)
+                    break
+                except OSError:
+                    continue
+            
+            if font is None:
+                # Use default font if no TTF fonts are available
+                font = ImageFont.load_default()
 
         pages=[]
         for n in names:
