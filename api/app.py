@@ -191,38 +191,52 @@ def generate():
             images.append((img, name))  # Store both image and name
 
         if output_format == "png":
-            # SOLUTION 2: Super-Fast No Compression ZIP Generation
+            # SOLUTION 3: Ultra-Optimized for Maximum Speed (Maintains Quality)
             zip_buffer = io.BytesIO()
             
-            # Use ZIP_STORED (no compression) for maximum speed
+            # Use fastest possible ZIP settings
             with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_STORED) as zip_file:
+                # Batch process all images first
+                processed_images = []
+                
+                # Pre-process all images without writing to ZIP yet
                 for i, (img, name) in enumerate(images, 1):
-                    png_buffer = io.BytesIO()
-                    
-                    # Ultra-fast PNG settings for maximum speed
-                    img.save(png_buffer, format="PNG", optimize=False, compress_level=0)
-                    
-                    # Clean filename (remove special characters)
+                    # Clean filename first
                     clean_name = "".join(c for c in name if c.isalnum() or c in (' ', '-', '_')).strip()
-                    if not clean_name:  # If name becomes empty after cleaning
+                    if not clean_name:
                         clean_name = f"Certificate_{i}"
                     
-                    # Create filename
-                    filename = f"{clean_name}.png"
+                    # Convert to PNG in memory with minimal settings
+                    png_buffer = io.BytesIO()
                     
-                    # Handle duplicate names by adding number only if needed
-                    original_filename = filename
-                    counter = 1
-                    while filename in [f.filename for f in zip_file.filelist]:
-                        name_part = clean_name
-                        filename = f"{name_part}_{counter}.png"
-                        counter += 1
+                    # FASTEST PNG settings possible while maintaining quality
+                    img.save(png_buffer, 
+                            format="PNG", 
+                            optimize=False, 
+                            compress_level=0,
+                            pnginfo=None)  # Skip metadata for speed
                     
-                    # Add file to ZIP
-                    zip_file.writestr(filename, png_buffer.getvalue())
-                    
-                    # Close PNG buffer
+                    processed_images.append((f"{clean_name}.png", png_buffer.getvalue()))
                     png_buffer.close()
+                
+                # Handle duplicate names efficiently
+                filename_counts = {}
+                final_images = []
+                
+                for filename, png_data in processed_images:
+                    if filename in filename_counts:
+                        filename_counts[filename] += 1
+                        base_name = filename.replace('.png', '')
+                        final_filename = f"{base_name}_{filename_counts[filename]}.png"
+                    else:
+                        filename_counts[filename] = 0
+                        final_filename = filename
+                    
+                    final_images.append((final_filename, png_data))
+                
+                # Write all to ZIP in one batch
+                for filename, png_data in final_images:
+                    zip_file.writestr(filename, png_data)
             
             # Prepare ZIP for download
             zip_buffer.seek(0)
@@ -257,6 +271,7 @@ def generate():
 
     except Exception as e:
         return Response(f"Error: {e}", 500)
+
 
 
 @app.route('/test-font/<font_name>')
