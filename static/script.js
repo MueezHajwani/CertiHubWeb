@@ -214,3 +214,67 @@ namesIn.onchange = async () => {
   fileB.textContent = format === "pdf" ? "Generate PDF" : "Generate PNGs";
   fileB.disabled = false;
 };
+// Add after your existing JavaScript code
+
+/* Font preloading and caching */
+let fontCache = new Set();
+
+function preloadFont(fontName, fontSize) {
+    const cacheKey = `${fontName}_${fontSize}`;
+    if (fontCache.has(cacheKey)) {
+        return Promise.resolve(); // Already cached
+    }
+    
+    // Make a quick request to load/cache the font
+    return fetch('/preview-font', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `font_name=${encodeURIComponent(fontName)}&font_size=${fontSize}`
+    }).then(() => {
+        fontCache.add(cacheKey);
+    }).catch(console.error);
+}
+
+// Preload common fonts when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    const commonFonts = ['Anton', 'Poppins', 'Roboto', 'Open Sans', 'Lato'];
+    const commonSizes = [20, 30, 40, 50, 60];
+    
+    // Preload fonts in background
+    setTimeout(() => {
+        commonFonts.forEach(font => {
+            commonSizes.forEach(size => {
+                preloadFont(font, size);
+            });
+        });
+    }, 1000); // Wait 1 second after page load
+});
+
+// Override the existing font change handler to preload
+const originalFontChange = fontSel.onchange;
+fontSel.onchange = function() {
+    const selectedFont = this.value;
+    const currentSize = parseInt(sizeSel.value) || 40;
+    
+    // Preload the selected font
+    preloadFont(selectedFont, currentSize).then(() => {
+        // Call the original preview function
+        if (originalFontChange) originalFontChange.call(this);
+        preview();
+    });
+};
+
+// Also preload when size changes
+const originalSizeChange = sizeSel.onchange;
+sizeSel.onchange = function() {
+    const selectedFont = fontSel.value;
+    const currentSize = parseInt(this.value) || 40;
+    
+    preloadFont(selectedFont, currentSize).then(() => {
+        if (originalSizeChange) originalSizeChange.call(this);
+        preview();
+    });
+};
+
