@@ -211,7 +211,16 @@ def generate():
                         clean_name = f"Certificate_{i}"
                     
                     # Create filename
-                    filename = f"{i:03d}_{clean_name}.png"
+                    filename = f"{clean_name}.png"
+                    
+                    
+                    # Handle duplicate names by adding number only if needed
+                    original_filename = filename
+                    counter = 1
+                    while filename in [f.filename for f in zip_file.filelist]:
+                        name_part = clean_name
+                        filename = f"{name_part}_{counter}.png"
+                        counter += 1
                     
                     # Add file to ZIP
                     zip_file.writestr(filename, png_data)
