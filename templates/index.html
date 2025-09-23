@@ -3,7 +3,6 @@
   <head>
     <meta charset="UTF-8" />
     <title>CertiHub Web</title>
-
     <!-- Google Fonts Integration -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -11,218 +10,19 @@
       href="https://fonts.googleapis.com/css2?family=Anton&family=Arimo:wght@400;700&family=Ballet&family=Bebas+Neue&family=Cabin:wght@400;700&family=DM+Sans:wght@400;700&family=Fira+Sans:wght@400;700&family=Heebo:wght@400;700&family=Inter:wght@400;700&family=Josefin+Sans:wght@400;700&family=Karla:wght@400;700&family=Lato:wght@400;700&family=Libre+Baskerville:wght@400;700&family=Merriweather:wght@400;700&family=Montserrat:wght@400;700&family=Mukta:wght@400;700&family=Noto+Sans:wght@400;700&family=Nunito:wght@400;700&family=Open+Sans:wght@400;700&family=Orbitron:wght@400;700;900&family=Oswald:wght@400;700&family=Playfair+Display:wght@400;700&family=Poppins:wght@400;600;700&family=PT+Sans:wght@400;700&family=Raleway:wght@400;700&family=Roboto:wght@400;700&family=Roboto+Slab:wght@400;700&family=Ubuntu:wght@400;700&family=Work+Sans:wght@400;700&display=swap"
       rel="stylesheet"
     />
-
-    <!--  Font delivery  -->
-    <style>
-      /* Remove local @font-face declarations and use Google Fonts instead */
-
-      * {
-        font-family: "Orbitron", monospace;
-      }
-      body {
-        background: #112e42;
-        color: white;
-        text-align: center;
-      }
-
-      h1 {
-        background: linear-gradient(135deg, #1ec1cb, #00a8ff, #8e44ad);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        font-size: 3.5rem;
-        font-weight: bold;
-        text-shadow: 0 4px 8px rgba(30, 193, 203, 0.3);
-        letter-spacing: 3px;
-        margin: 20px 0;
-        position: relative;
-      }
-      h1::after {
-        content: "";
-        position: absolute;
-        bottom: -10px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 200px;
-        height: 3px;
-        background: linear-gradient(90deg, #1ec1cb, #00a8ff);
-        border-radius: 2px;
-        box-shadow: 0 2px 10px rgba(30, 193, 203, 0.5);
-      }
-      h3 {
-        font-size: 2.5rem;
-      }
-      #template-upload-container {
-        height: 50px;
-        margin-bottom: 10px;
-      }
-      #template-upload-btn {
-        padding: 10px 20px;
-        font-size: 16px;
-        width: 200px;
-        background: linear-gradient(135deg, #1ec1cb, #00a8ff);
-        color: white;
-        border: none;
-        border-radius: 8px;
-        cursor: pointer;
-        font-weight: bold;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        transition: 0.3s;
-        box-shadow: 0 4px 15px rgba(30, 193, 203, 0.3);
-        position: relative;
-        overflow: hidden;
-      }
-      #template-upload-btn::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: -100%;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(
-          90deg,
-          transparent,
-          rgba(255, 255, 255, 0.2),
-          transparent
-        );
-        transition: left 0.5s;
-      }
-      #template-upload-btn:hover {
-        box-shadow: 0 8px 25px rgba(30, 193, 203, 0.5);
-        background: linear-gradient(135deg, #00a8ff, #8e44ad);
-      }
-      #template-upload-btn:hover::before {
-        left: 100%;
-      }
-      #template-upload-btn:active {
-        transform: translateY(0);
-        box-shadow: 0 4px 15px rgba(30, 193, 203, 0.3);
-      }
-      #template-upload {
-        display: none;
-      }
-
-      #canvas-container {
-        position: relative;
-        display: inline-block;
-        margin-top: 10px;
-      }
-      #template-canvas {
-        background: #2b2b2b;
-        border: 2px solid white;
-      }
-
-      #instruction-label {
-        margin-top: 10px;
-        font-size: 16px;
-        color: #ddd;
-      }
-      #button-container {
-        margin-top: 20px;
-        text-align: center;
-      }
-      #next-btn,
-      #back-btn,
-      #file-upload-btn {
-        display: none;
-        margin: 0 10px;
-        padding: 10px 20px;
-        font-size: 16px;
-        width: 200px;
-        background: linear-gradient(135deg, #1ec1cb, #00a8ff);
-        color: white;
-        border: none;
-        border-radius: 8px;
-        cursor: pointer;
-        font-weight: bold;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        transition: 0.3s;
-        box-shadow: 0 4px 15px rgba(30, 193, 203, 0.3);
-        position: relative;
-        overflow: hidden;
-      }
-      #next-btn::before,
-      #back-btn::before,
-      #file-upload-btn::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: -100%;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(
-          90deg,
-          transparent,
-          rgba(255, 255, 255, 0.2),
-          transparent
-        );
-        transition: left 0.5s;
-      }
-      #next-btn:hover,
-      #back-btn:hover,
-      #file-upload-btn:hover {
-        box-shadow: 0 8px 25px rgba(30, 193, 203, 0.5);
-        background: linear-gradient(135deg, #00a8ff, #8e44ad);
-      }
-      #next-btn:hover::before,
-      #back-btn:hover::before,
-      #file-upload-btn:hover::before {
-        left: 100%;
-      }
-      #next-btn:active,
-      #back-btn:active,
-      #file-upload-btn:active {
-        transform: translateY(0);
-        box-shadow: 0 4px 15px rgba(30, 193, 203, 0.3);
-      }
-
-      #settings {
-        display: none;
-        position: absolute;
-        left: -280px;
-        top: -15px;
-        width: 220px;
-        background: #112e42;
-        padding: 10px;
-        border: 1px solid #112e42;
-        text-align: center;
-      }
-      #settings label {
-        display: block;
-        margin-top: 10px;
-        font-size: 14px;
-      }
-      #settings select,
-      #settings input {
-        background: lightgray;
-        width: 100%;
-        margin-top: 5px;
-        border-radius: 8px;
-        padding: 5px;
-        font-size: 14px;
-      }
-      #settings h3 {
-        margin-bottom: 10px;
-      }
-      .loading {
-        opacity: 0.6;
-        pointer-events: none;
-      }
-    </style>
+    <!-- Link to external CSS file -->
+    <link rel="stylesheet" href="/static/style.css" />
   </head>
   <body>
     <h1>CertiHub</h1>
-
     <div id="template-upload-container">
       <button id="template-upload-btn">Choose Template</button>
       <input id="template-upload" type="file" accept=".png,.jpg,.jpeg" hidden />
     </div>
-
     <div id="canvas-container">
       <canvas id="template-canvas" width="900" height="550"></canvas>
 
+      <!-- Font Settings Panel (Left) -->
       <div id="settings">
         <h3>Font Settings</h3>
         <label>Font Style:</label>
@@ -257,190 +57,47 @@
           <option value="Ubuntu">Ubuntu</option>
           <option value="Work Sans">Work Sans</option>
         </select>
-
         <label>Font Size:</label>
         <select id="font-size"></select>
-
         <label>Font Color:</label>
         <input type="color" id="font-color" value="#000000" />
+      </div>
+
+      <!-- Download Settings Panel (Right) -->
+      <div id="download-settings">
+        <h3>Download Settings</h3>
+        <div class="radio-group">
+          <label class="radio-option">
+            <input type="radio" name="output-format" value="pdf" checked />
+            <span class="radio-custom"></span>
+            <span class="radio-text">PDF (Single File)</span>
+          </label>
+
+          <label class="radio-option">
+            <input type="radio" name="output-format" value="png" />
+            <span class="radio-custom"></span>
+            <span class="radio-text">PNG Images (ZIP)</span>
+          </label>
+        </div>
+
+        <div id="format-info">
+          <small id="format-description"
+            >Single PDF with all certificates</small
+          >
+        </div>
       </div>
     </div>
 
     <div id="instruction-label">
       Please upload a template and drag to select where names will be printed.
     </div>
-
     <div id="button-container">
       <button id="next-btn">Next</button>
       <button id="file-upload-btn">Select File</button>
       <input id="names-file" type="file" accept=".txt,.pdf,.xlsx" hidden />
       <button id="back-btn">Back</button>
     </div>
-
-    <script>
-      const upIn = document.getElementById("template-upload");
-      const upBtn = document.getElementById("template-upload-btn");
-      const cvs = document.getElementById("template-canvas");
-      const ctx = cvs.getContext("2d");
-      const nextB = document.getElementById("next-btn");
-      const backB = document.getElementById("back-btn");
-      const instr = document.getElementById("instruction-label");
-      const setDiv = document.getElementById("settings");
-      const fontSel = document.getElementById("font-style");
-      const sizeSel = document.getElementById("font-size");
-      const colorIn = document.getElementById("font-color");
-      const fileB = document.getElementById("file-upload-btn");
-      const namesIn = document.getElementById("names-file");
-
-      let img = new Image(),
-        drag = false,
-        step2 = false,
-        sx,
-        sy,
-        ex,
-        ey;
-
-      /* fill size dropdown */
-      for (let i = 1; i <= 120; i++) {
-        const o = document.createElement("option");
-        o.value = i;
-        o.text = i;
-        if (i === 40) o.selected = true;
-        sizeSel.appendChild(o);
-      }
-
-      /* choose template */
-      upBtn.onclick = () => upIn.click();
-      upIn.onchange = (e) => {
-        const f = e.target.files[0];
-        if (!f) return;
-        const r = new FileReader();
-        r.onload = (ev) => {
-          img.onload = () => {
-            ctx.clearRect(0, 0, 900, 550);
-            ctx.drawImage(img, 0, 0, 900, 550);
-          };
-          img.src = ev.target.result;
-        };
-        r.readAsDataURL(f);
-        cvs.style.cursor = "crosshair";
-      };
-
-      /* drag rectangle */
-      cvs.onmousedown = (e) => {
-        if (!img.src) return;
-        drag = true;
-        const r = cvs.getBoundingClientRect();
-        sx = e.clientX - r.left;
-        sy = e.clientY - r.top;
-        if (!step2) {
-          upIn.hidden = upBtn.hidden = true;
-          instr.style.display = "none";
-        }
-      };
-      cvs.onmousemove = (e) => {
-        if (!drag) return;
-        const r = cvs.getBoundingClientRect();
-        ex = e.clientX - r.left;
-        ey = e.clientY - r.top;
-        drawRect();
-      };
-      cvs.onmouseup = () => {
-        if (!drag) return;
-        drag = false;
-        preview();
-        if (!step2) {
-          nextB.style.display = backB.style.display = "inline-block";
-        }
-      };
-
-      function drawRect() {
-        ctx.clearRect(0, 0, 900, 550);
-        ctx.drawImage(img, 0, 0, 900, 550);
-        ctx.strokeStyle = "red";
-        ctx.setLineDash([6]);
-        ctx.strokeRect(sx, sy, ex - sx, ey - sy);
-      }
-      function preview() {
-        if (!sx || !ex) return;
-        drawRect();
-        const cx = (sx + ex) / 2,
-          cy = (sy + ey) / 2;
-        const fam = fontSel.value; // Now using Google Font names directly
-        ctx.font = `${sizeSel.value}px "${fam}"`;
-        ctx.fillStyle = colorIn.value;
-        ctx.textAlign = "center";
-        ctx.setLineDash([]);
-        ctx.fillText("Your Name", cx, cy);
-      }
-
-      /* Sort font dropdown alphabetically */
-      (function sortFontDropdown() {
-        const select = document.getElementById("font-style");
-        const opts = Array.from(select.options);
-        opts.sort((a, b) =>
-          a.text.toLowerCase().localeCompare(b.text.toLowerCase())
-        );
-        opts.forEach((o) => select.appendChild(o));
-      })();
-
-      /* nav */
-      nextB.onclick = () => {
-        setDiv.style.display = "block";
-        nextB.style.display = "none";
-        fileB.style.display = "inline-block";
-        step2 = true;
-      };
-      backB.onclick = () => {
-        setDiv.style.display =
-          nextB.style.display =
-          fileB.style.display =
-          backB.style.display =
-            "none";
-        upIn.hidden = upBtn.hidden = false;
-        instr.style.display = "block";
-        ctx.clearRect(0, 0, 900, 550);
-        img = new Image();
-        upIn.value = "";
-        namesIn.value = "";
-        step2 = false;
-      };
-
-      /* live preview */
-      fontSel.onchange = sizeSel.onchange = colorIn.onchange = preview;
-
-      /* choose names file */
-      fileB.onclick = () => namesIn.click();
-      namesIn.onchange = async () => {
-        if (!namesIn.files.length) return;
-        if (!upIn.files.length) {
-          alert("Upload a template first");
-          return;
-        }
-        fileB.textContent = "Generating…";
-        fileB.disabled = true;
-        try {
-          const fd = new FormData();
-          fd.append("template", upIn.files[0]);
-          fd.append("names", namesIn.files[0]);
-          fd.append("font_style", fontSel.value);
-          fd.append("font_size", sizeSel.value);
-          fd.append("font_color", colorIn.value);
-          fd.append("coords", [sx, sy, ex, ey].join(","));
-          const res = await fetch("/generate", { method: "POST", body: fd });
-          if (!res.ok) throw new Error(`Server ${res.status}`);
-          const blob = await res.blob();
-          const a = document.createElement("a");
-          a.href = URL.createObjectURL(blob);
-          a.download = "Certificates.pdf";
-          a.click();
-          namesIn.value = "";
-        } catch (err) {
-          alert("Error: " + err.message);
-        }
-        fileB.textContent = "Select File";
-        fileB.disabled = false;
-      };
-    </script>
+    <!-- Link to external JavaScript file -->
+    <script src="/static/script.js"></script>
   </body>
 </html>
