@@ -22,6 +22,39 @@ let img = new Image(),
   ex,
   ey;
 
+// Font mapping for instant preview (web-safe fallbacks)
+const FONT_PREVIEW_MAP = {
+  "Anton": "Impact, 'Arial Black', sans-serif",
+  "Arimo": "Arial, sans-serif", 
+  "Orbitron": "'Courier New', monospace",
+  "Ballet": "'Brush Script MT', cursive",
+  "Bebas Neue": "Impact, 'Arial Black', sans-serif",
+  "Cabin": "'Trebuchet MS', sans-serif",
+  "DM Sans": "Arial, sans-serif",
+  "Fira Sans": "'Segoe UI', sans-serif",
+  "Heebo": "Arial, sans-serif",
+  "Inter": "'Segoe UI', sans-serif", 
+  "Josefin Sans": "'Century Gothic', sans-serif",
+  "Karla": "Arial, sans-serif",
+  "Lato": "'Segoe UI', sans-serif",
+  "Libre Baskerville": "Georgia, serif",
+  "Merriweather": "Georgia, serif",
+  "Montserrat": "'Segoe UI', sans-serif",
+  "Mukta": "Arial, sans-serif",
+  "Noto Sans": "Arial, sans-serif",
+  "Nunito": "'Segoe UI', sans-serif",
+  "Open Sans": "Arial, sans-serif",
+  "Oswald": "'Arial Narrow', sans-serif",
+  "Playfair Display": "Georgia, serif",
+  "Poppins": "'Segoe UI', sans-serif",
+  "PT Sans": "Arial, sans-serif",
+  "Raleway": "'Century Gothic', sans-serif",
+  "Roboto Slab": "'Courier New', serif", 
+  "Roboto": "Arial, sans-serif",
+  "Ubuntu": "'Trebuchet MS', sans-serif",
+  "Work Sans": "'Segoe UI', sans-serif"
+};
+
 /* fill size dropdown */
 for (let i = 1; i <= 120; i++) {
   const o = document.createElement("option");
@@ -51,7 +84,6 @@ document.addEventListener('DOMContentLoaded', function() {
   formatRadios.forEach(radio => {
     radio.addEventListener('change', updateFormatDescription);
   });
-  // Set initial description
   updateFormatDescription();
 });
 
@@ -115,8 +147,12 @@ function preview() {
   drawRect();
   const cx = (sx + ex) / 2,
     cy = (sy + ey) / 2;
-  const fam = fontSel.value;
-  ctx.font = `${sizeSel.value}px "${fam}"`;
+  const selectedFont = fontSel.value;
+  
+  // Use web-safe font for instant preview
+  const previewFont = FONT_PREVIEW_MAP[selectedFont] || "Arial, sans-serif";
+  
+  ctx.font = `${sizeSel.value}px ${previewFont}`;
   ctx.fillStyle = colorIn.value;
   ctx.textAlign = "center";
   ctx.setLineDash([]);
@@ -140,7 +176,7 @@ nextB.onclick = () => {
   nextB.style.display = "none";
   fileB.style.display = "inline-block";
   step2 = true;
-  updateFormatDescription(); // Update description when showing panel
+  updateFormatDescription();
 };
 
 backB.onclick = () => {
@@ -159,8 +195,10 @@ backB.onclick = () => {
   step2 = false;
 };
 
-/* live preview */
-fontSel.onchange = sizeSel.onchange = colorIn.onchange = preview;
+/* INSTANT live preview - no delays! */
+fontSel.onchange = preview;
+sizeSel.onchange = preview;
+colorIn.onchange = preview;
 
 /* choose names file */
 fileB.onclick = () => namesIn.click();
@@ -179,7 +217,7 @@ namesIn.onchange = async () => {
   }
   
   const format = formatElement.value;
-  fileB.textContent = format === "pdf" ? "Generating PDF" : "Generating PNGs";
+  fileB.textContent = format === "pdf" ? "Generating PDF..." : "Generating PNGs...";
   fileB.disabled = true;
   
   try {
@@ -214,67 +252,3 @@ namesIn.onchange = async () => {
   fileB.textContent = format === "pdf" ? "Generate PDF" : "Generate PNGs";
   fileB.disabled = false;
 };
-// Add after your existing JavaScript code
-
-/* Font preloading and caching */
-let fontCache = new Set();
-
-function preloadFont(fontName, fontSize) {
-    const cacheKey = `${fontName}_${fontSize}`;
-    if (fontCache.has(cacheKey)) {
-        return Promise.resolve(); // Already cached
-    }
-    
-    // Make a quick request to load/cache the font
-    return fetch('/preview-font', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: `font_name=${encodeURIComponent(fontName)}&font_size=${fontSize}`
-    }).then(() => {
-        fontCache.add(cacheKey);
-    }).catch(console.error);
-}
-
-// Preload common fonts when page loads
-document.addEventListener('DOMContentLoaded', function() {
-    const commonFonts = ['Anton', 'Poppins', 'Roboto', 'Open Sans', 'Lato'];
-    const commonSizes = [20, 30, 40, 50, 60];
-    
-    // Preload fonts in background
-    setTimeout(() => {
-        commonFonts.forEach(font => {
-            commonSizes.forEach(size => {
-                preloadFont(font, size);
-            });
-        });
-    }, 1000); // Wait 1 second after page load
-});
-
-// Override the existing font change handler to preload
-const originalFontChange = fontSel.onchange;
-fontSel.onchange = function() {
-    const selectedFont = this.value;
-    const currentSize = parseInt(sizeSel.value) || 40;
-    
-    // Preload the selected font
-    preloadFont(selectedFont, currentSize).then(() => {
-        // Call the original preview function
-        if (originalFontChange) originalFontChange.call(this);
-        preview();
-    });
-};
-
-// Also preload when size changes
-const originalSizeChange = sizeSel.onchange;
-sizeSel.onchange = function() {
-    const selectedFont = fontSel.value;
-    const currentSize = parseInt(this.value) || 40;
-    
-    preloadFont(selectedFont, currentSize).then(() => {
-        if (originalSizeChange) originalSizeChange.call(this);
-        preview();
-    });
-};
-
