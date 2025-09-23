@@ -191,28 +191,24 @@ def generate():
             images.append((img, name))  # Store both image and name
 
         if output_format == "png":
-            # Generate ZIP file with PNG images - FIXED VERSION
+            # SOLUTION 2: Super-Fast No Compression ZIP Generation
             zip_buffer = io.BytesIO()
             
-            with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED, compresslevel=6) as zip_file:
+            # Use ZIP_STORED (no compression) for maximum speed
+            with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_STORED) as zip_file:
                 for i, (img, name) in enumerate(images, 1):
-                    # Create PNG buffer for each image
                     png_buffer = io.BytesIO()
                     
-                    # Save image as PNG
-                    img.save(png_buffer, format="PNG", optimize=True)
-                    
-                    # Get the PNG data
-                    png_data = png_buffer.getvalue()
+                    # Ultra-fast PNG settings for maximum speed
+                    img.save(png_buffer, format="PNG", optimize=False, compress_level=0)
                     
                     # Clean filename (remove special characters)
-                    clean_name = "".join(c for c in name if c.isalnum() or c in (' ', '-', '_', '.')).strip()
+                    clean_name = "".join(c for c in name if c.isalnum() or c in (' ', '-', '_')).strip()
                     if not clean_name:  # If name becomes empty after cleaning
                         clean_name = f"Certificate_{i}"
                     
                     # Create filename
                     filename = f"{clean_name}.png"
-                    
                     
                     # Handle duplicate names by adding number only if needed
                     original_filename = filename
@@ -223,7 +219,7 @@ def generate():
                         counter += 1
                     
                     # Add file to ZIP
-                    zip_file.writestr(filename, png_data)
+                    zip_file.writestr(filename, png_buffer.getvalue())
                     
                     # Close PNG buffer
                     png_buffer.close()
@@ -261,6 +257,7 @@ def generate():
 
     except Exception as e:
         return Response(f"Error: {e}", 500)
+
 
 @app.route('/test-font/<font_name>')
 def test_font(font_name):
