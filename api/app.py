@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, Response
 from PIL import Image, ImageDraw, ImageFont
 from pypdf import PdfReader
 import pandas as pd
-import io, os
+import io, os, zipfile  # Added zipfile import
 
 # IMPORTANT: Configure paths for Vercel
 app = Flask(__name__, 
@@ -53,7 +53,7 @@ def read_names(fs):
     if fs.filename.endswith(".txt"):
         names = [ln.strip() for ln in data.decode("utf-8").splitlines() if ln.strip()]
     elif fs.filename.endswith(".xlsx"):
-        df = pd.read_excel(io.BytesIO(data), header=None, engine='openpyxl')  # Add engine='openpyxl'
+        df = pd.read_excel(io.BytesIO(data), header=None, engine='openpyxl')
         for col in df.columns:
             names += [str(v).strip() for v in df[col] if str(v).strip().lower() != "nan"]
     elif fs.filename.endswith(".pdf"):
@@ -62,7 +62,6 @@ def read_names(fs):
             if (txt := p.extract_text()):
                 names += [ln.strip() for ln in txt.splitlines() if ln.strip()]
     return names
-
 
 def get_font(font_name, font_size):
     """Get PIL font object from Google Font name"""
@@ -167,10 +166,11 @@ def generate():
     try:
         tpl_f    = request.files["template"]
         names_f  = request.files["names"]
-        fname    = request.form["font_style"]  # This will now be a Google Font name like "Anton"
+        fname    = request.form["font_style"]
         fsize    = int(request.form["font_size"])
         fcolor   = hex_to_rgb(request.form["font_color"])
         sx,sy,ex,ey = map(float, request.form["coords"].split(","))
+        output_format = request.form.get("output_format", "pdf")
 
         tpl = Image.open(io.BytesIO(tpl_f.read())).convert("RGB")
         ow,oh = tpl.size
@@ -180,20 +180,76 @@ def generate():
         if not names:
             return Response("No names found", 400)
 
-        # Use the new font loading function
+        # Use the font loading function
         font = get_font(fname, fsize)
 
-        pages=[]
-        for n in names:
-            img=tpl.copy()
-            ImageDraw.Draw(img).text((cx,cy), n, font=font, fill=fcolor, anchor="mm")
-            pages.append(img)
+        # Generate images with names
+        images = []
+        for name in names:
+            img = tpl.copy()
+            ImageDraw.Draw(img).text((cx,cy), name, font=font, fill=fcolor, anchor="mm")
+            images.append((img, name))  # Store both image and name
 
-        pdf=io.BytesIO()
-        pages[0].save(pdf, format="PDF", save_all=True, append_images=pages[1:])
-        pdf.seek(0)
-        return Response(pdf.getvalue(), mimetype="application/pdf",
-                        headers={"Content-Disposition":"attachment; filename=Certificates.pdf"})
+        if output_format == "png":
+            # Generate ZIP file with PNG images - FIXED VERSION
+            zip_buffer = io.BytesIO()
+            
+            with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED, compresslevel=6) as zip_file:
+                for i, (img, name) in enumerate(images, 1):
+                    # Create PNG buffer for each image
+                    png_buffer = io.BytesIO()
+                    
+                    # Save image as PNG
+                    img.save(png_buffer, format="PNG", optimize=True)
+                    
+                    # Get the PNG data
+                    png_data = png_buffer.getvalue()
+                    
+                    # Clean filename (remove special characters)
+                    clean_name = "".join(c for c in name if c.isalnum() or c in (' ', '-', '_', '.')).strip()
+                    if not clean_name:  # If name becomes empty after cleaning
+                        clean_name = f"Certificate_{i}"
+                    
+                    # Create filename
+                    filename = f"{i:03d}_{clean_name}.png"
+                    
+                    # Add file to ZIP
+                    zip_file.writestr(filename, png_data)
+                    
+                    # Close PNG buffer
+                    png_buffer.close()
+            
+            # Prepare ZIP for download
+            zip_buffer.seek(0)
+            zip_data = zip_buffer.getvalue()
+            zip_buffer.close()
+            
+            # Return ZIP file
+            return Response(
+                zip_data, 
+                mimetype="application/zip",
+                headers={
+                    "Content-Disposition": "attachment; filename=Certificates.zip",
+                    "Content-Length": str(len(zip_data))
+                }
+            )
+        
+        else:
+            # Generate PDF (existing functionality)
+            pdf_images = [img for img, name in images]  # Extract just images
+            pdf = io.BytesIO()
+            if pdf_images:
+                pdf_images[0].save(
+                    pdf, 
+                    format="PDF", 
+                    save_all=True, 
+                    append_images=pdf_images[1:] if len(pdf_images) > 1 else None,
+                    optimize=True
+                )
+            pdf.seek(0)
+            return Response(pdf.getvalue(), mimetype="application/pdf",
+                          headers={"Content-Disposition": "attachment; filename=Certificates.pdf"})
+
     except Exception as e:
         return Response(f"Error: {e}", 500)
 
@@ -208,5 +264,3 @@ def test_font(font_name):
             return f"⚠️ Font '{font_name}' loaded as default font (TTF not found)"
     except Exception as e:
         return f"❌ Error loading font '{font_name}': {str(e)}"
-
-# REMOVE any if __name__ == '__main__' block completely
