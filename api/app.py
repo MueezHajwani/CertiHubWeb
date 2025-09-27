@@ -161,7 +161,6 @@ def preview_font():
     except Exception as e:
         return {"status": "error", "message": str(e)}, 500
 
-# Your existing routes...
 @app.route('/debug-fonts')
 def debug_fonts():
     """Debug route to check font directory and mappings"""
@@ -229,12 +228,136 @@ def serve_font(filename):
     except Exception as e:
         return Response(f"Error serving font: {e}", 500)
 
-# Your existing generate route stays the same...
 @app.route("/generate", methods=["POST"])
 def generate():
-    # ... your existing generate code (no changes needed)
-    # The get_font() function will now use cached fonts
-    pass
+    try:
+        print("=== Generate route started ===")
+        
+        # Get form data with validation
+        if "template" not in request.files:
+            return Response("No template file uploaded", 400)
+        if "names" not in request.files:
+            return Response("No names file uploaded", 400)
+            
+        tpl_f = request.files["template"]
+        names_f = request.files["names"]
+        fname = request.form.get("font_style", "Anton")
+        fsize = int(request.form.get("font_size", 40))
+        fcolor = hex_to_rgb(request.form.get("font_color", "#000000"))
+        coords = request.form.get("coords", "0,0,100,100")
+        sx, sy, ex, ey = map(float, coords.split(","))
+        output_format = request.form.get("output_format", "pdf")
+        
+        print(f"Font: {fname}, Size: {fsize}, Format: {output_format}")
+
+        # Process template image
+        print("Processing template image...")
+        tpl = Image.open(io.BytesIO(tpl_f.read())).convert("RGB")
+        ow, oh = tpl.size
+        cx, cy = ((sx+ex)/2)*(ow/900), ((sy+ey)/2)*(oh/550)
+        print(f"Template size: {ow}x{oh}, Text position: {cx},{cy}")
+
+        # Read names
+        print("Reading names...")
+        names = read_names(names_f)
+        if not names:
+            return Response("No names found in uploaded file", 400)
+        print(f"Found {len(names)} names")
+
+        # Load font
+        print(f"Loading font: {fname}")
+        font = get_font(fname, fsize)
+        print("Font loaded successfully")
+
+        # Generate images with names
+        print("Generating images...")
+        images = []
+        for i, name in enumerate(names):
+            try:
+                img = tpl.copy()
+                ImageDraw.Draw(img).text((cx, cy), name, font=font, fill=fcolor, anchor="mm")
+                images.append((img, name))
+                if i % 10 == 0:  # Progress logging
+                    print(f"Generated {i+1}/{len(names)} images")
+            except Exception as e:
+                print(f"Error generating image for {name}: {str(e)}")
+                raise
+
+        print(f"Generated {len(images)} images successfully")
+
+        if output_format == "png":
+            print("Creating ZIP file...")
+            # PNG ZIP generation
+            zip_buffer = io.BytesIO()
+            
+            with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_STORED) as zip_file:
+                processed_images = []
+                
+                for i, (img, name) in enumerate(images, 1):
+                    clean_name = "".join(c for c in name if c.isalnum() or c in (' ', '-', '_')).strip()
+                    if not clean_name:
+                        clean_name = f"Certificate_{i}"
+                    
+                    png_buffer = io.BytesIO()
+                    img.save(png_buffer, format="PNG", optimize=False, compress_level=0, pnginfo=None)
+                    processed_images.append((f"{clean_name}.png", png_buffer.getvalue()))
+                    png_buffer.close()
+                
+                filename_counts = {}
+                final_images = []
+                
+                for filename, png_data in processed_images:
+                    if filename in filename_counts:
+                        filename_counts[filename] += 1
+                        base_name = filename.replace('.png', '')
+                        final_filename = f"{base_name}_{filename_counts[filename]}.png"
+                    else:
+                        filename_counts[filename] = 0
+                        final_filename = filename
+                    
+                    final_images.append((final_filename, png_data))
+                
+                for filename, png_data in final_images:
+                    zip_file.writestr(filename, png_data)
+            
+            zip_buffer.seek(0)
+            zip_data = zip_buffer.getvalue()
+            zip_buffer.close()
+            
+            print("ZIP file created successfully")
+            return Response(
+                zip_data, 
+                mimetype="application/zip",
+                headers={
+                    "Content-Disposition": "attachment; filename=Certificates.zip",
+                    "Content-Length": str(len(zip_data))
+                }
+            )
+        
+        else:
+            print("Creating PDF...")
+            pdf_images = [img for img, name in images]
+            pdf = io.BytesIO()
+            if pdf_images:
+                pdf_images[0].save(
+                    pdf, 
+                    format="PDF", 
+                    save_all=True, 
+                    append_images=pdf_images[1:] if len(pdf_images) > 1 else None,
+                    optimize=True
+                )
+            pdf.seek(0)
+            print("PDF created successfully")
+            return Response(pdf.getvalue(), mimetype="application/pdf",
+                          headers={"Content-Disposition": "attachment; filename=Certificates.pdf"})
+
+    except Exception as e:
+        print(f"=== ERROR in generate route ===")
+        print(f"Error type: {type(e).__name__}")
+        print(f"Error message: {str(e)}")
+        import traceback
+        print(f"Full traceback: {traceback.format_exc()}")
+        return Response(f"Server Error: {str(e)}", 500)
 
 @app.route('/test-font/<font_name>')
 def test_font(font_name):
