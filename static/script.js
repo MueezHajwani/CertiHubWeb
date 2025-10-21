@@ -22,6 +22,54 @@ let img = new Image(),
   ex,
   ey;
 
+// Font loading tracker
+let fontsLoaded = false;
+let fontsLoadingPromise = null;
+
+// Force load all fonts on page load
+function forceLoadAllFonts() {
+  if (fontsLoadingPromise) {
+    return fontsLoadingPromise;
+  }
+
+  const fontList = [
+    'Anton', 'Arimo', 'Orbitron', 'Ballet', 'Bebas Neue', 'Cabin',
+    'DM Sans', 'Fira Sans', 'Heebo', 'Inter', 'Josefin Sans', 'Karla',
+    'Lato', 'Libre Baskerville', 'Merriweather', 'Montserrat', 'Mukta',
+    'Noto Sans', 'Nunito', 'Open Sans', 'Oswald', 'Playfair Display',
+    'Poppins', 'PT Sans', 'Raleway', 'Roboto Slab', 'Roboto', 'Ubuntu', 'Work Sans'
+  ];
+
+  if ('fonts' in document) {
+    const fontPromises = fontList.map(fontName => {
+      return document.fonts.load(`40px "${fontName}"`).catch(() => {
+        console.warn(`Failed to load font: ${fontName}`);
+      });
+    });
+
+    fontsLoadingPromise = Promise.all(fontPromises).then(() => {
+      fontsLoaded = true;
+      console.log('✅ All fonts loaded successfully!');
+      return true;
+    }).catch(() => {
+      fontsLoaded = true;
+      console.warn('⚠️ Some fonts failed to load, continuing...');
+      return true;
+    });
+
+    return fontsLoadingPromise;
+  } else {
+    fontsLoadingPromise = new Promise((resolve) => {
+      setTimeout(() => {
+        fontsLoaded = true;
+        console.log('✅ Font loading timeout completed');
+        resolve(true);
+      }, 2000);
+    });
+    return fontsLoadingPromise;
+  }
+}
+
 /* fill size dropdown */
 for (let i = 1; i <= 120; i++) {
   const o = document.createElement("option");
@@ -45,13 +93,15 @@ function updateFormatDescription() {
   }
 }
 
-/* Add event listeners to radio buttons */
+/* Add event listeners to radio buttons and start font loading */
 document.addEventListener('DOMContentLoaded', function() {
+  console.log('🔄 Starting font preload...');
+  forceLoadAllFonts();
+  
   const formatRadios = document.querySelectorAll('input[name="output-format"]');
   formatRadios.forEach(radio => {
     radio.addEventListener('change', updateFormatDescription);
   });
-  // Set initial description
   updateFormatDescription();
 });
 
@@ -93,9 +143,13 @@ cvs.onmousemove = (e) => {
   drawRect();
 };
 
-cvs.onmouseup = () => {
+cvs.onmouseup = async () => {
   if (!drag) return;
   drag = false;
+  
+  // WAIT for fonts before drawing preview
+  await forceLoadAllFonts();
+  
   preview();
   if (!step2) {
     nextB.style.display = backB.style.display = "inline-block";
@@ -110,13 +164,21 @@ function drawRect() {
   ctx.strokeRect(sx, sy, ex - sx, ey - sy);
 }
 
-function preview() {
+async function preview() {
   if (!sx || !ex) return;
+  
+  // CRITICAL: Wait for fonts to load before drawing
+  if (!fontsLoaded) {
+    await forceLoadAllFonts();
+  }
+  
   drawRect();
   const cx = (sx + ex) / 2,
     cy = (sy + ey) / 2;
   const fam = fontSel.value;
-  ctx.font = `${sizeSel.value}px "${fam}"`;
+  
+  // Set font with fallback
+  ctx.font = `${sizeSel.value}px "${fam}", Arial, sans-serif`;
   ctx.fillStyle = colorIn.value;
   ctx.textAlign = "center";
   ctx.setLineDash([]);
@@ -140,7 +202,7 @@ nextB.onclick = () => {
   nextB.style.display = "none";
   fileB.style.display = "inline-block";
   step2 = true;
-  updateFormatDescription(); // Update description when showing panel
+  updateFormatDescription();
 };
 
 backB.onclick = () => {
@@ -159,8 +221,18 @@ backB.onclick = () => {
   step2 = false;
 };
 
-/* live preview */
-fontSel.onchange = sizeSel.onchange = colorIn.onchange = preview;
+/* live preview - WAIT for fonts */
+fontSel.onchange = async () => {
+  await forceLoadAllFonts();
+  preview();
+};
+
+sizeSel.onchange = async () => {
+  await forceLoadAllFonts();
+  preview();
+};
+
+colorIn.onchange = preview;
 
 /* choose names file */
 fileB.onclick = () => namesIn.click();
@@ -171,7 +243,6 @@ namesIn.onchange = async () => {
     return;
   }
   
-  // Get the selected format
   const formatElement = document.querySelector('input[name="output-format"]:checked');
   if (!formatElement) {
     alert("Please select an output format");
@@ -213,67 +284,4 @@ namesIn.onchange = async () => {
   
   fileB.textContent = format === "pdf" ? "Generate PDF" : "Generate PNGs";
   fileB.disabled = false;
-};
-// Add after your existing JavaScript code
-
-/* Font preloading and caching */
-let fontCache = new Set();
-
-function preloadFont(fontName, fontSize) {
-    const cacheKey = `${fontName}_${fontSize}`;
-    if (fontCache.has(cacheKey)) {
-        return Promise.resolve(); // Already cached
-    }
-    
-    // Make a quick request to load/cache the font
-    return fetch('/preview-font', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: `font_name=${encodeURIComponent(fontName)}&font_size=${fontSize}`
-    }).then(() => {
-        fontCache.add(cacheKey);
-    }).catch(console.error);
-}
-
-// Preload common fonts when page loads
-document.addEventListener('DOMContentLoaded', function() {
-    const commonFonts = ['Anton', 'Poppins', 'Roboto', 'Open Sans', 'Lato'];
-    const commonSizes = [20, 30, 40, 50, 60];
-    
-    // Preload fonts in background
-    setTimeout(() => {
-        commonFonts.forEach(font => {
-            commonSizes.forEach(size => {
-                preloadFont(font, size);
-            });
-        });
-    }, 1000); // Wait 1 second after page load
-});
-
-// Override the existing font change handler to preload
-const originalFontChange = fontSel.onchange;
-fontSel.onchange = function() {
-    const selectedFont = this.value;
-    const currentSize = parseInt(sizeSel.value) || 40;
-    
-    // Preload the selected font
-    preloadFont(selectedFont, currentSize).then(() => {
-        // Call the original preview function
-        if (originalFontChange) originalFontChange.call(this);
-        preview();
-    });
-};
-
-// Also preload when size changes
-const originalSizeChange = sizeSel.onchange;
-sizeSel.onchange = function() {
-    const selectedFont = fontSel.value;
-    const currentSize = parseInt(this.value) || 40;
-    
-    preloadFont(selectedFont, currentSize).then(() => {
-        if (originalSizeChange) originalSizeChange.call(this);
-        preview();
-    });
 };
