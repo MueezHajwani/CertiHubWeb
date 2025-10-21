@@ -105,21 +105,117 @@ document.addEventListener('DOMContentLoaded', function() {
   updateFormatDescription();
 });
 
-/* choose template */
+/* ===== DRAG & DROP FUNCTIONALITY ===== */
+const canvasContainer = document.getElementById("canvas-container");
+const canvas = document.getElementById("template-canvas");
+const dragOverlay = document.getElementById("canvas-overlay");
+
+// Prevent default drag behaviors on the entire document
+['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+  document.addEventListener(eventName, preventDefaults, false);
+});
+
+function preventDefaults(e) {
+  e.preventDefault();
+  e.stopPropagation();
+}
+
+// Highlight drag area when file is dragged over
+['dragenter', 'dragover'].forEach(eventName => {
+  canvasContainer.addEventListener(eventName, highlight, false);
+  canvas.addEventListener(eventName, highlight, false);
+});
+
+['dragleave', 'drop'].forEach(eventName => {
+  canvasContainer.addEventListener(eventName, unhighlight, false);
+  canvas.addEventListener(eventName, unhighlight, false);
+});
+
+function highlight(e) {
+  dragOverlay.classList.add('active');
+  canvas.classList.add('drag-hover');
+}
+
+function unhighlight(e) {
+  dragOverlay.classList.remove('active');
+  canvas.classList.remove('drag-hover');
+}
+
+// Handle dropped files
+canvasContainer.addEventListener('drop', handleDrop, false);
+canvas.addEventListener('drop', handleDrop, false);
+
+function handleDrop(e) {
+  const dt = e.dataTransfer;
+  const files = dt.files;
+  
+  if (files.length > 0) {
+    const file = files[0];
+    
+    // Validate file type
+    const validTypes = ['image/png', 'image/jpg', 'image/jpeg'];
+    if (!validTypes.includes(file.type)) {
+      alert('Please drop a valid image file (PNG, JPG, JPEG)');
+      return;
+    }
+    
+    // Validate file size (max 10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      alert('File size too large. Please use files under 10MB.');
+      return;
+    }
+    
+    // Process the dropped file (same as file input)
+    processTemplateFile(file);
+  }
+}
+
+function processTemplateFile(file) {
+  const reader = new FileReader();
+  
+  reader.onload = (ev) => {
+    img.onload = () => {
+      ctx.clearRect(0, 0, 900, 550);
+      ctx.drawImage(img, 0, 0, 900, 550);
+      
+      // Hide upload button and show instructions
+      upIn.hidden = upBtn.hidden = true;
+      instr.style.display = "none";
+      
+      // Show success message
+      showDropSuccess();
+    };
+    img.src = ev.target.result;
+  };
+  
+  reader.readAsDataURL(file);
+  cvs.style.cursor = "crosshair";
+}
+
+function showDropSuccess() {
+  // Create temporary success message
+  const successMsg = document.createElement('div');
+  successMsg.innerHTML = `
+    <div style="position: absolute; top: 10px; right: 10px; background: #1ec1cb; color: white; padding: 8px 12px; border-radius: 5px; font-size: 12px; z-index: 100; box-shadow: 0 4px 15px rgba(30, 193, 203, 0.3);">
+      ✅ Template uploaded successfully!
+    </div>
+  `;
+  canvasContainer.appendChild(successMsg);
+  
+  // Remove message after 3 seconds
+  setTimeout(() => {
+    if (successMsg.parentNode) {
+      successMsg.parentNode.removeChild(successMsg);
+    }
+  }, 3000);
+}
+
+/* choose template - Updated to use shared processing function */
 upBtn.onclick = () => upIn.click();
 upIn.onchange = (e) => {
   const f = e.target.files[0];
   if (!f) return;
-  const r = new FileReader();
-  r.onload = (ev) => {
-    img.onload = () => {
-      ctx.clearRect(0, 0, 900, 550);
-      ctx.drawImage(img, 0, 0, 900, 550);
-    };
-    img.src = ev.target.result;
-  };
-  r.readAsDataURL(f);
-  cvs.style.cursor = "crosshair";
+  processTemplateFile(f);
 };
 
 /* drag rectangle */
@@ -250,7 +346,7 @@ namesIn.onchange = async () => {
   }
   
   const format = formatElement.value;
-  fileB.textContent = format === "pdf" ? "Generating PDF" : "Generating PNGs";
+  fileB.textContent = format === "pdf" ? "Generating PDF..." : "Generating PNGs...";
   fileB.disabled = true;
   
   try {
