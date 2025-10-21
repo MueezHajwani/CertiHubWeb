@@ -1,5 +1,6 @@
 const upIn = document.getElementById("template-upload");
 const upBtn = document.getElementById("template-upload-btn");
+const dragLi = document.getElementById("drag-drop-hint");
 const cvs = document.getElementById("template-canvas");
 const ctx = cvs.getContext("2d");
 const nextB = document.getElementById("next-btn");
@@ -179,9 +180,7 @@ function processTemplateFile(file) {
       ctx.drawImage(img, 0, 0, 900, 550);
       
       // Hide upload button and show instructions
-      upIn.hidden = upBtn.hidden = true;
-      instr.style.display = "none";
-      
+      upIn.hidden  = true;
       // Show success message
       showDropSuccess();
     };
@@ -219,17 +218,20 @@ upIn.onchange = (e) => {
 };
 
 /* drag rectangle */
-cvs.onmousedown = (e) => {
-  if (!img.src) return;
-  drag = true;
-  const r = cvs.getBoundingClientRect();
-  sx = e.clientX - r.left;
-  sy = e.clientY - r.top;
-  if (!step2) {
-    upIn.hidden = upBtn.hidden = true;
-    instr.style.display = "none";
-  }
-};
+  cvs.onmousedown = (e) => {
+    if (!img.src) return;
+    drag = true;
+    const r = cvs.getBoundingClientRect();
+    sx = e.clientX - r.left;
+    sy = e.clientY - r.top;
+    if (!step2) {
+      upIn.hidden = upBtn.hidden = true;
+      dragLi.textContent = "Now drag to select where names will be printed";
+      dragLi.style.fontSize = "20px";
+      dragLi.style.paddingTop = "25px";
+      instr.style.display = "none";
+    }
+  };
 
 cvs.onmousemove = (e) => {
   if (!drag) return;
@@ -293,8 +295,9 @@ async function preview() {
 
 /* nav */
 nextB.onclick = () => {
+  dragLi.textContent = "Select the names File,Font and Download settings below";
   setDiv.style.display = "block";
-  downloadSettingsDiv.style.display = "block";
+  downloadSettingsDiv.style.display = "block";  
   nextB.style.display = "none";
   fileB.style.display = "inline-block";
   step2 = true;
@@ -308,6 +311,10 @@ backB.onclick = () => {
     fileB.style.display =
     backB.style.display =
       "none";
+  dragLi.textContent = "or Drag & Drop your certificate template here";
+  dragLi.style.display = "block";
+  dragLi.style.fontSize = "";        // Reset to CSS default
+  dragLi.style.paddingTop = ""; 
   upIn.hidden = upBtn.hidden = false;
   instr.style.display = "block";
   ctx.clearRect(0, 0, 900, 550);
