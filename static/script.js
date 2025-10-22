@@ -23,9 +23,25 @@ let img = new Image(),
   ex,
   ey;
 
+// 📱 NEW: Mobile-specific variables
+let isMobile = false;
+let mobileTextY = 275; // Default center Y position for mobile
+let mobileVerticalDrag = false;
+let lastTouchY = 0;
+
 // Font loading tracker
 let fontsLoaded = false;
 let fontsLoadingPromise = null;
+
+// 📱 NEW: Check if device is mobile (480px and below)
+function checkMobile() {
+  isMobile = window.innerWidth <= 480;
+  return isMobile;
+}
+
+// 📱 NEW: Initialize mobile check
+checkMobile();
+window.addEventListener('resize', checkMobile);
 
 // Force load all fonts on page load
 function forceLoadAllFonts() {
@@ -184,6 +200,12 @@ function processTemplateFile(file) {
       
       // Hide upload button and show instructions
       upIn.hidden = true;
+      
+      // 📱 NEW: Auto-setup for mobile
+      if (checkMobile()) {
+        setupMobileMode();
+      }
+      
       // Show success message
       showDropSuccess();
     };
@@ -191,7 +213,29 @@ function processTemplateFile(file) {
   };
   
   reader.readAsDataURL(file);
-  cvs.style.cursor = "crosshair";
+  cvs.style.cursor = checkMobile() ? "grab" : "crosshair";
+}
+
+// 📱 NEW: Mobile setup function
+function setupMobileMode() {
+  // Auto-set text area for mobile (center horizontally, middle vertically)
+  sx = 50;  // 50px from left
+  sy = mobileTextY - 30; // Text area top
+  ex = 850; // 850px from left (800px width)
+  ey = mobileTextY + 30; // Text area bottom (60px height)
+  
+  // Skip normal dragging flow
+  upIn.hidden = upBtn.hidden = true;
+  dragLi.textContent = "Drag the name up/down to position it";
+  dragLi.style.fontSize = "18px";
+  dragLi.style.paddingTop = "20px";
+  instr.style.display = "none";
+  
+  // Show buttons immediately
+  nextB.style.display = backB.style.display = "inline-block";
+  
+  // Show preview
+  preview();
 }
 
 function showDropSuccess() {
@@ -220,9 +264,57 @@ upIn.onchange = (e) => {
   processTemplateFile(f);
 };
 
-/* drag rectangle */
+/* 📱 NEW: Mobile touch events for vertical dragging */
+cvs.addEventListener('touchstart', (e) => {
+  if (!checkMobile() || !img.src) return;
+  
+  e.preventDefault();
+  const touch = e.touches[0];
+  const rect = cvs.getBoundingClientRect();
+  lastTouchY = touch.clientY - rect.top;
+  mobileVerticalDrag = true;
+  cvs.style.cursor = "grabbing";
+});
+
+cvs.addEventListener('touchmove', (e) => {
+  if (!checkMobile() || !mobileVerticalDrag) return;
+  
+  e.preventDefault();
+  const touch = e.touches[0];
+  const rect = cvs.getBoundingClientRect();
+  const currentTouchY = touch.clientY - rect.top;
+  
+  // Calculate movement (scaled to canvas coordinates)
+  const deltaY = (currentTouchY - lastTouchY) * (550 / rect.height);
+  
+  // Update mobile text Y position (with bounds)
+  mobileTextY = Math.max(50, Math.min(500, mobileTextY + deltaY));
+  
+  // Update text area coordinates
+  sy = mobileTextY - 30;
+  ey = mobileTextY + 30;
+  
+  // Update preview
+  preview();
+  
+  lastTouchY = currentTouchY;
+});
+
+cvs.addEventListener('touchend', (e) => {
+  if (!checkMobile()) return;
+  
+  e.preventDefault();
+  mobileVerticalDrag = false;
+  cvs.style.cursor = "grab";
+});
+
+/* 🖥️ DESKTOP: Normal drag rectangle */
 cvs.onmousedown = (e) => {
   if (!img.src) return;
+  
+  // Skip desktop dragging on mobile
+  if (checkMobile()) return;
+  
   drag = true;
   const r = cvs.getBoundingClientRect();
   sx = e.clientX - r.left;
@@ -237,7 +329,7 @@ cvs.onmousedown = (e) => {
 };
 
 cvs.onmousemove = (e) => {
-  if (!drag) return;
+  if (!drag || checkMobile()) return;
   const r = cvs.getBoundingClientRect();
   ex = e.clientX - r.left;
   ey = e.clientY - r.top;
@@ -245,7 +337,7 @@ cvs.onmousemove = (e) => {
 };
 
 cvs.onmouseup = async () => {
-  if (!drag) return;
+  if (!drag || checkMobile()) return;
   drag = false;
   
   // WAIT for fonts before drawing preview
@@ -273,7 +365,14 @@ async function preview() {
     await forceLoadAllFonts();
   }
   
-  drawRect();
+  if (!checkMobile()) {
+    drawRect();
+  } else {
+    // Mobile: Just redraw image without rectangle
+    ctx.clearRect(0, 0, 900, 550);
+    ctx.drawImage(img, 0, 0, 900, 550);
+  }
+  
   const cx = (sx + ex) / 2,
     cy = (sy + ey) / 2;
   const fam = fontSel.value;
@@ -284,6 +383,19 @@ async function preview() {
   ctx.textAlign = "center";
   ctx.setLineDash([]);
   ctx.fillText("Your Name", cx, cy);
+  
+  // 📱 Mobile: Show drag indicator
+  if (checkMobile()) {
+    ctx.strokeStyle = "#1ec1cb";
+    ctx.setLineDash([4]);
+    ctx.strokeRect(sx, sy, ex - sx, ey - sy);
+    
+    // Add drag arrows
+    ctx.fillStyle = "#1ec1cb";
+    ctx.font = "20px Arial";
+    ctx.fillText("▲", cx + 100, sy - 10);
+    ctx.fillText("▼", cx + 100, ey + 25);
+  }
 }
 
 /* Sort font dropdown alphabetically */
@@ -325,6 +437,10 @@ backB.onclick = () => {
   upIn.value = "";
   namesIn.value = "";
   step2 = false;
+  
+  // 📱 NEW: Reset mobile state
+  mobileTextY = 275;
+  mobileVerticalDrag = false;
 };
 
 /* live preview - WAIT for fonts */
