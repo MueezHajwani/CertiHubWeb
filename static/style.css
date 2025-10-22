@@ -8,6 +8,7 @@ body {
     background: #112e42;
     color: white;
     text-align: center;
+
 }
 
 h1 {
@@ -197,7 +198,7 @@ h3 {
 }
 
 #button-container {
-    margin-top: 20px;
+    margin-top: 13px;
     text-align: center;
 }
 
