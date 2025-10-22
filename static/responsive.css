@@ -7,7 +7,6 @@
    GLOBAL RESPONSIVE SETTINGS
    ========================================================================== */
 
-/* Reset and global mobile settings */
 * {
     box-sizing: border-box;
 }
@@ -41,6 +40,7 @@ html {
         text-align: center;
         width: 100%;
         line-height: 1.1;
+        order: 0;
     }
 
     /* Template upload section */
@@ -49,6 +49,7 @@ html {
         text-align: center;
         width: 100%;
         max-width: 500px;
+        order: 1;
     }
 
     #template-upload-btn {
@@ -79,6 +80,7 @@ html {
         flex-direction: column;
         align-items: center;
         justify-content: center;
+        order: 2;
     }
 
     #template-canvas {
@@ -104,6 +106,14 @@ html {
         padding: 20px !important;
         border-radius: 10px;
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    #settings {
+        order: 3;
+    }
+
+    #download-settings {
+        order: 4;
     }
 
     /* Settings headers */
@@ -177,6 +187,7 @@ html {
         width: 100%;
         max-width: 500px;
         align-items: center;
+        order: 5;
     }
 
     #button-container button {
@@ -201,26 +212,26 @@ html {
 
     body.step2-active #canvas-container,
     body:has(#settings[style*="block"]) #canvas-container {
-        order: 1;
+        order: 2;
         position: static !important;
         margin: 20px auto;
     }
 
     body.step2-active #settings,
     body:has(#settings[style*="block"]) #settings {
-        order: 2;
+        order: 3;
         position: static !important;
     }
 
     body.step2-active #download-settings,
     body:has(#download-settings[style*="block"]) #download-settings {
-        order: 3;
+        order: 4;
         position: static !important;
     }
 
     body.step2-active #button-container,
     body:has(#settings[style*="block"]) #button-container {
-        order: 4;
+        order: 5;
         margin: 30px auto;
     }
 }
@@ -267,7 +278,6 @@ html {
         padding: 16px;
     }
 
-    /* Canvas overlay responsive */
     .drag-overlay .drag-message {
         padding: 25px;
     }
@@ -291,7 +301,6 @@ html {
 
 @media screen and (max-width: 375px) {
 
-    /* Global mobile settings */
     html,
     body {
         margin: 0;
@@ -309,7 +318,6 @@ html {
         min-height: 100vh;
     }
 
-    /* Title - Perfect for 375px */
     h1 {
         font-size: 2.8rem;
         margin: 15px 0 20px 0;
@@ -319,7 +327,6 @@ html {
         line-height: 1.1;
     }
 
-    /* Template upload section */
     #template-upload-container {
         margin: 15px 0;
         text-align: center;
@@ -353,7 +360,6 @@ html {
         text-align: center;
     }
 
-    /* Canvas container - PERFECT 375px sizing */
     #canvas-container {
         position: relative;
         margin: 20px auto;
@@ -377,9 +383,9 @@ html {
         margin: 0 auto;
         object-fit: contain;
         border: 2px solid rgba(30, 193, 203, 0.3);
+        aspect-ratio: 16/9;
     }
 
-    /* Canvas overlay for drag & drop */
     #canvas-overlay {
         position: absolute;
         top: 0;
@@ -439,7 +445,6 @@ html {
         opacity: 0.9;
     }
 
-    /* Settings panels - Mobile optimized */
     #settings,
     #download-settings {
         position: static !important;
@@ -468,7 +473,6 @@ html {
         font-weight: 600;
     }
 
-    /* Form elements */
     #settings select,
     #settings input[type="color"] {
         width: 100%;
@@ -480,7 +484,6 @@ html {
         background: rgba(255, 255, 255, 0.1);
         -webkit-backdrop-filter: blur(10px);
         backdrop-filter: blur(5px);
-
     }
 
     #settings label {
@@ -490,13 +493,11 @@ html {
         display: block;
     }
 
-    /* Font size dropdown - compact display */
     #font-size {
         max-height: 150px;
         overflow-y: auto;
     }
 
-    /* Radio groups */
     .radio-group {
         display: flex;
         flex-direction: column;
@@ -529,13 +530,11 @@ html {
         margin-left: 8px;
     }
 
-    /* Format info */
     #format-info small {
         font-size: 12px;
         opacity: 0.8;
     }
 
-    /* Instruction label */
     #instruction-label {
         font-size: 16px;
         text-align: center;
@@ -549,7 +548,6 @@ html {
         border: 1px solid rgba(30, 193, 203, 0.3);
     }
 
-    /* Button container */
     #button-container {
         display: flex;
         flex-direction: column;
@@ -578,7 +576,6 @@ html {
         box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
     }
 
-    /* Ensure perfect centering */
     #template-upload-container,
     #canvas-container,
     #settings,
@@ -588,12 +585,6 @@ html {
         margin-left: auto;
         margin-right: auto;
     }
-
-    /* Fix canvas aspect ratio for mobile */
-    #template-canvas {
-        aspect-ratio: 16/9;
-        object-fit: contain;
-    }
 }
 
 /* ==========================================================================
@@ -601,8 +592,6 @@ html {
    ========================================================================== */
 
 @media screen and (max-width: 360px) {
-
-    /* Canvas container - Perfect 360px fit */
     #canvas-container {
         max-width: 340px;
         padding: 0 10px;
@@ -624,7 +613,6 @@ html {
         max-width: 300px;
     }
 
-    /* Compact spacing for small screens */
     h1 {
         font-size: 2.4rem;
     }
@@ -718,7 +706,6 @@ html {
    ADDITIONAL MOBILE IMPROVEMENTS
    ========================================================================== */
 
-/* Ensure no horizontal scroll on mobile */
 @media screen and (max-width: 768px) {
     * {
         max-width: 100%;
@@ -729,7 +716,6 @@ html {
         overflow-x: hidden;
     }
 
-    /* Perfect centering for all elements */
     #template-upload-container,
     #canvas-container,
     #settings,
@@ -740,12 +726,10 @@ html {
         margin-right: auto;
     }
 
-    /* Canvas perfect centering */
     #canvas-container {
         text-align: center;
     }
 
-    /* Smooth transitions for better mobile experience */
     #template-canvas,
     #settings,
     #download-settings,
@@ -760,8 +744,6 @@ html {
    ========================================================================== */
 
 @media screen and (max-width: 768px) {
-
-    /* Ensure settings panels don't overlap canvas on mobile */
     #canvas-container {
         display: flex;
         flex-direction: column;
@@ -772,7 +754,6 @@ html {
         margin-bottom: 20px;
     }
 
-    /* Force vertical layout when settings are visible */
     #settings,
     #download-settings {
         position: static !important;
@@ -786,7 +767,6 @@ html {
         display: block !important;
     }
 
-    /* Ensure proper stacking order */
     #canvas-container {
         z-index: 1;
     }
@@ -801,5 +781,44 @@ html {
 
     #button-container {
         z-index: 4;
+    }
+}
+
+/* ========================================================================== */
+/* DESKTOP / LAPTOP - Reset to original size (1024px and above) */
+/* ========================================================================== */
+
+@media screen and (min-width: 1024px) {
+    #template-canvas {
+        width: 900px !important;
+        height: 550px !important;
+        max-width: 900px !important;
+        max-height: 550px !important;
+        aspect-ratio: auto !important;
+    }
+
+    #canvas-container {
+        position: relative;
+        display: inline-block;
+        margin-top: 10px;
+        max-width: none;
+    }
+
+    #settings,
+    #download-settings {
+        position: absolute !important;
+        width: 220px !important;
+        max-width: 220px !important;
+        margin: 0 !important;
+    }
+
+    #settings {
+        left: -280px !important;
+        top: -15px !important;
+    }
+
+    #download-settings {
+        left: 102% !important;
+        top: -4% !important;
     }
 }

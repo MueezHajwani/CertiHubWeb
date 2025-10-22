@@ -176,11 +176,14 @@ function processTemplateFile(file) {
   
   reader.onload = (ev) => {
     img.onload = () => {
-      ctx.clearRect(0, 0, 900, 550);
+      // ✅ SET CANVAS SIZE - This is the fix!
+      cvs.width = 900;
+      cvs.height = 550;
+      
       ctx.drawImage(img, 0, 0, 900, 550);
       
       // Hide upload button and show instructions
-      upIn.hidden  = true;
+      upIn.hidden = true;
       // Show success message
       showDropSuccess();
     };
@@ -218,20 +221,20 @@ upIn.onchange = (e) => {
 };
 
 /* drag rectangle */
-  cvs.onmousedown = (e) => {
-    if (!img.src) return;
-    drag = true;
-    const r = cvs.getBoundingClientRect();
-    sx = e.clientX - r.left;
-    sy = e.clientY - r.top;
-    if (!step2) {
-      upIn.hidden = upBtn.hidden = true;
-      dragLi.textContent = "Now drag to select where names will be printed";
-      dragLi.style.fontSize = "20px";
-      dragLi.style.paddingTop = "25px";
-      instr.style.display = "none";
-    }
-  };
+cvs.onmousedown = (e) => {
+  if (!img.src) return;
+  drag = true;
+  const r = cvs.getBoundingClientRect();
+  sx = e.clientX - r.left;
+  sy = e.clientY - r.top;
+  if (!step2) {
+    upIn.hidden = upBtn.hidden = true;
+    dragLi.textContent = "Now drag to select where names will be printed";
+    dragLi.style.fontSize = "20px";
+    dragLi.style.paddingTop = "25px";
+    instr.style.display = "none";
+  }
+};
 
 cvs.onmousemove = (e) => {
   if (!drag) return;
@@ -313,7 +316,7 @@ backB.onclick = () => {
       "none";
   dragLi.textContent = "or Drag & Drop your certificate template here";
   dragLi.style.display = "block";
-  dragLi.style.fontSize = "";        // Reset to CSS default
+  dragLi.style.fontSize = "";
   dragLi.style.paddingTop = ""; 
   upIn.hidden = upBtn.hidden = false;
   instr.style.display = "block";
