@@ -1,0 +1,269 @@
+/* Mobile First Responsive Design - Enhanced for better centering */
+
+/* Tablet and smaller desktop (768px and below) */
+@media screen and (max-width: 768px) {
+
+    /* Main container adjustments */
+    body {
+        padding: 15px;
+        font-size: 16px;
+        /* Increased font size */
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-height: 100vh;
+        ;
+    }
+
+    /* Title */
+    h1 {
+        font-size: 3rem;
+        /* Increased from 2.5rem */
+        margin-bottom: 25px;
+        text-align: center;
+        width: 100%;
+    }
+
+    /* Template upload section */
+    #template-upload-container {
+        margin: 25px 0;
+        text-align: center;
+        width: 100%;
+        max-width: 500px;
+        /* Limit width on tablets */
+    }
+
+    #template-upload-btn {
+        font-size: 16px;
+        /* Increased from 14px */
+        padding: 15px 25px;
+        /* Increased padding */
+        width: 100%;
+        max-width: 350px;
+        /* Increased max-width */
+        border-radius: 8px;
+    }
+
+    #drag-drop-hint {
+        font-size: 14px;
+        /* Increased from 12px */
+        margin: 20px 0;
+        /* Increased margin */
+        padding: 0 15px;
+        line-height: 1.4;
+    }
+
+    /* Canvas container - PERFECT CENTERING */
+    #canvas-container {
+        position: relative;
+        margin: 25px auto;
+        width: 100%;
+        max-width: 500px;
+        /* Perfect size for mobile */
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+    #template-canvas {
+        width: 100%;
+        height: auto;
+        border-radius: 10px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        display: block;
+        margin: 0 auto;
+        /* Extra centering */
+    }
+
+    /* Settings panels - Better mobile layout */
+    #settings,
+    #download-settings {
+        position: static !important;
+        width: 100% !important;
+        max-width: 500px !important;
+        /* Match canvas width */
+        margin: 25px auto !important;
+        /* Center and increase spacing */
+        left: auto !important;
+        right: auto !important;
+        transform: none !important;
+        padding: 20px !important;
+        /* Increased padding */
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Settings headers */
+    #settings h3,
+    #download-settings h3 {
+        font-size: 1.5rem;
+        /* Increased from default */
+        margin-bottom: 15px;
+        text-align: center;
+    }
+
+    /* Form elements in settings */
+    #settings select,
+    #settings input[type="color"],
+    #settings label {
+        width: 100%;
+        margin: 10px 0;
+        /* Increased margin */
+        font-size: 16px;
+        /* Increased font size */
+        padding: 12px;
+        /* Increased padding */
+    }
+
+    #settings label {
+        font-size: 16px;
+        font-weight: 600;
+        margin-bottom: 5px;
+        display: block;
+    }
+
+    /* Radio group adjustments */
+    .radio-group {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        /* Increased gap */
+        margin: 15px 0;
+    }
+
+    .radio-option {
+        width: 100%;
+        font-size: 16px;
+        /* Increased font size */
+        padding: 12px;
+        border-radius: 6px;
+        background: rgba(255, 255, 255, 0.05);
+    }
+
+    /* Instruction label */
+    #instruction-label {
+        font-size: 16px;
+        /* Increased from 14px */
+        text-align: center;
+        padding: 0 15px;
+        margin: 20px 0;
+        max-width: 500px;
+        width: 100%;
+    }
+
+    /* Button container */
+    #button-container {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        /* Increased gap */
+        margin: 35px 0;
+        /* Increased margin */
+        padding: 0 20px;
+        width: 100%;
+        max-width: 500px;
+        /* Match other elements */
+        align-items: center;
+    }
+
+    #button-container button {
+        width: 100%;
+        padding: 18px;
+        /* Increased padding */
+        font-size: 18px;
+        /* Increased font size */
+        border-radius: 10px;
+        max-width: 350px;
+        /* Limit button width */
+    }
+}
+
+/* Large mobile phones (480px and below) */
+@media screen and (max-width: 480px) {
+    body {
+        padding: 10px;
+    }
+
+    h1 {
+        font-size: 2.5rem;
+        /* Still large on small phones */
+        margin-bottom: 20px;
+    }
+
+    #canvas-container {
+        max-width: 100%;
+        /* Full width on small phones */
+        margin: 20px auto;
+    }
+
+    #template-canvas {
+        border-radius: 8px;
+    }
+
+    #settings,
+    #download-settings {
+        max-width: 100% !important;
+        padding: 18px !important;
+        margin: 20px auto !important;
+    }
+
+    #button-container {
+        max-width: 100%;
+        padding: 0 15px;
+    }
+
+    #button-container button {
+        max-width: 100%;
+        font-size: 16px;
+        padding: 16px;
+    }
+
+    /* Canvas overlay responsive */
+    .drag-overlay .drag-message {
+        padding: 25px;
+    }
+
+    .drag-overlay .drag-message i {
+        font-size: 2.5rem;
+    }
+
+    .drag-overlay .drag-message p {
+        font-size: 16px;
+    }
+
+    .drag-overlay .drag-message small {
+        font-size: 13px;
+    }
+}
+
+/* Additional improvements for better visual hierarchy */
+@media screen and (max-width: 768px) {
+
+    /* Ensure everything is perfectly centered */
+    * {
+        box-sizing: border-box;
+    }
+
+    /* Better spacing for all elements */
+    #template-upload-container,
+    #canvas-container,
+    #settings,
+    #download-settings,
+    #instruction-label,
+    #button-container {
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    /* Ensure canvas is perfectly centered */
+    #canvas-container {
+        text-align: center;
+    }
+
+    #template-canvas {
+        max-width: 100%;
+        height: auto;
+        object-fit: contain;
+    }
+}
