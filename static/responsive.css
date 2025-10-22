@@ -1,27 +1,46 @@
-/* Mobile First Responsive Design - Enhanced for better centering */
+/* ========================================
+   CERTIHUB RESPONSIVE CSS
+   Complete mobile-first responsive design
+   ======================================== */
 
-/* Tablet and smaller desktop (768px and below) */
+/* ==========================================================================
+   GLOBAL RESPONSIVE SETTINGS
+   ========================================================================== */
+
+/* Reset and global mobile settings */
+* {
+    box-sizing: border-box;
+}
+
+html {
+    font-size: 16px;
+    line-height: 1.4;
+}
+
+/* ==========================================================================
+   TABLET AND SMALL DESKTOP (768px and below)
+   ========================================================================== */
+
 @media screen and (max-width: 768px) {
 
     /* Main container adjustments */
     body {
         padding: 15px;
         font-size: 16px;
-        /* Increased font size */
         display: flex;
         flex-direction: column;
         align-items: center;
         min-height: 100vh;
-        ;
+        overflow-x: hidden;
     }
 
     /* Title */
     h1 {
         font-size: 3rem;
-        /* Increased from 2.5rem */
         margin-bottom: 25px;
         text-align: center;
         width: 100%;
+        line-height: 1.1;
     }
 
     /* Template upload section */
@@ -30,27 +49,24 @@
         text-align: center;
         width: 100%;
         max-width: 500px;
-        /* Limit width on tablets */
     }
 
     #template-upload-btn {
         font-size: 16px;
-        /* Increased from 14px */
         padding: 15px 25px;
-        /* Increased padding */
         width: 100%;
         max-width: 350px;
-        /* Increased max-width */
         border-radius: 8px;
+        display: block;
+        margin: 0 auto;
     }
 
     #drag-drop-hint {
         font-size: 14px;
-        /* Increased from 12px */
         margin: 20px 0;
-        /* Increased margin */
         padding: 0 15px;
         line-height: 1.4;
+        text-align: center;
     }
 
     /* Canvas container - PERFECT CENTERING */
@@ -59,7 +75,6 @@
         margin: 25px auto;
         width: 100%;
         max-width: 500px;
-        /* Perfect size for mobile */
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -73,7 +88,7 @@
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
         display: block;
         margin: 0 auto;
-        /* Extra centering */
+        object-fit: contain;
     }
 
     /* Settings panels - Better mobile layout */
@@ -82,14 +97,11 @@
         position: static !important;
         width: 100% !important;
         max-width: 500px !important;
-        /* Match canvas width */
         margin: 25px auto !important;
-        /* Center and increase spacing */
         left: auto !important;
         right: auto !important;
         transform: none !important;
         padding: 20px !important;
-        /* Increased padding */
         border-radius: 10px;
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     }
@@ -97,23 +109,20 @@
     /* Settings headers */
     #settings h3,
     #download-settings h3 {
-        font-size: 1.5rem;
-        /* Increased from default */
+        font-size: 18px;
         margin-bottom: 15px;
         text-align: center;
+        font-weight: 600;
     }
 
     /* Form elements in settings */
     #settings select,
-    #settings input[type="color"],
-    #settings label {
+    #settings input[type="color"] {
         width: 100%;
         margin: 10px 0;
-        /* Increased margin */
         font-size: 16px;
-        /* Increased font size */
         padding: 12px;
-        /* Increased padding */
+        border-radius: 6px;
     }
 
     #settings label {
@@ -128,23 +137,29 @@
         display: flex;
         flex-direction: column;
         gap: 15px;
-        /* Increased gap */
         margin: 15px 0;
     }
 
     .radio-option {
         width: 100%;
         font-size: 16px;
-        /* Increased font size */
         padding: 12px;
         border-radius: 6px;
         background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .radio-option:hover,
+    .radio-option:has(input:checked) {
+        background: rgba(30, 193, 203, 0.2);
+        border-color: #1ec1cb;
     }
 
     /* Instruction label */
     #instruction-label {
         font-size: 16px;
-        /* Increased from 14px */
         text-align: center;
         padding: 0 15px;
         margin: 20px 0;
@@ -157,29 +172,63 @@
         display: flex;
         flex-direction: column;
         gap: 20px;
-        /* Increased gap */
         margin: 35px 0;
-        /* Increased margin */
         padding: 0 20px;
         width: 100%;
         max-width: 500px;
-        /* Match other elements */
         align-items: center;
     }
 
     #button-container button {
         width: 100%;
         padding: 18px;
-        /* Increased padding */
         font-size: 18px;
-        /* Increased font size */
         border-radius: 10px;
         max-width: 350px;
-        /* Limit button width */
+        font-weight: 600;
+        border: none;
+        transition: all 0.3s ease;
+    }
+
+    /* Step 2 layout fixes */
+    body.step2-active,
+    body:has(#settings[style*="block"]) {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 10px;
+    }
+
+    body.step2-active #canvas-container,
+    body:has(#settings[style*="block"]) #canvas-container {
+        order: 1;
+        position: static !important;
+        margin: 20px auto;
+    }
+
+    body.step2-active #settings,
+    body:has(#settings[style*="block"]) #settings {
+        order: 2;
+        position: static !important;
+    }
+
+    body.step2-active #download-settings,
+    body:has(#download-settings[style*="block"]) #download-settings {
+        order: 3;
+        position: static !important;
+    }
+
+    body.step2-active #button-container,
+    body:has(#settings[style*="block"]) #button-container {
+        order: 4;
+        margin: 30px auto;
     }
 }
 
-/* Large mobile phones (480px and below) */
+/* ==========================================================================
+   LARGE MOBILE PHONES (480px and below) 
+   ========================================================================== */
+
 @media screen and (max-width: 480px) {
     body {
         padding: 10px;
@@ -187,18 +236,17 @@
 
     h1 {
         font-size: 2.5rem;
-        /* Still large on small phones */
         margin-bottom: 20px;
     }
 
     #canvas-container {
         max-width: 100%;
-        /* Full width on small phones */
         margin: 20px auto;
     }
 
     #template-canvas {
         border-radius: 8px;
+        max-height: 250px;
     }
 
     #settings,
@@ -237,15 +285,300 @@
     }
 }
 
-/* Additional improvements for better visual hierarchy */
-@media screen and (max-width: 768px) {
+/* ==========================================================================
+   MOBILE 375px WIDTH - iPhone 6/7/8, Galaxy S series
+   ========================================================================== */
 
-    /* Ensure everything is perfectly centered */
-    * {
-        box-sizing: border-box;
+@media screen and (max-width: 375px) {
+
+    /* Global mobile settings */
+    html,
+    body {
+        margin: 0;
+        padding: 0;
+        overflow-x: hidden;
+        width: 100%;
     }
 
-    /* Better spacing for all elements */
+    body {
+        padding: 10px;
+        font-size: 16px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-height: 100vh;
+    }
+
+    /* Title - Perfect for 375px */
+    h1 {
+        font-size: 2.8rem;
+        margin: 15px 0 20px 0;
+        text-align: center;
+        width: 100%;
+        font-weight: 700;
+        line-height: 1.1;
+    }
+
+    /* Template upload section */
+    #template-upload-container {
+        margin: 15px 0;
+        text-align: center;
+        width: 100%;
+        max-width: 355px;
+        padding: 0;
+    }
+
+    #template-upload-btn {
+        font-size: 16px;
+        padding: 14px 24px;
+        width: 100%;
+        max-width: 280px;
+        border-radius: 8px;
+        margin: 0 auto;
+        display: block;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    #template-upload-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(30, 193, 203, 0.3);
+    }
+
+    #drag-drop-hint {
+        font-size: 14px;
+        margin: 15px 0;
+        padding: 0 10px;
+        line-height: 1.4;
+        text-align: center;
+    }
+
+    /* Canvas container - PERFECT 375px sizing */
+    #canvas-container {
+        position: relative;
+        margin: 20px auto;
+        width: 100%;
+        max-width: 355px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+    }
+
+    #template-canvas {
+        width: 100%;
+        max-width: 355px;
+        height: auto;
+        max-height: 220px;
+        border-radius: 10px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        display: block;
+        margin: 0 auto;
+        object-fit: contain;
+        border: 2px solid rgba(30, 193, 203, 0.3);
+    }
+
+    /* Canvas overlay for drag & drop */
+    #canvas-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        border-radius: 10px;
+        pointer-events: none;
+        z-index: 10;
+    }
+
+    #canvas-overlay.active {
+        pointer-events: auto;
+        background: rgba(30, 193, 203, 0.1);
+        border: 2px dashed #1ec1cb;
+    }
+
+    .drag-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(30, 193, 203, 0.9);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .drag-overlay.active {
+        opacity: 1;
+    }
+
+    .drag-message {
+        text-align: center;
+        color: white;
+        padding: 20px;
+    }
+
+    .drag-message i {
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+        display: block;
+    }
+
+    .drag-message p {
+        font-size: 16px;
+        margin: 10px 0;
+        font-weight: 600;
+    }
+
+    .drag-message small {
+        font-size: 12px;
+        opacity: 0.9;
+    }
+
+    /* Settings panels - Mobile optimized */
+    #settings,
+    #download-settings {
+        position: static !important;
+        width: 100% !important;
+        max-width: 355px !important;
+        margin: 20px auto !important;
+        left: auto !important;
+        right: auto !important;
+        top: auto !important;
+        bottom: auto !important;
+        transform: none !important;
+        padding: 18px !important;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.1);
+        -webkit-backdrop-filter: blur(10px);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    #settings h3,
+    #download-settings h3 {
+        font-size: 18px;
+        margin-bottom: 15px;
+        text-align: center;
+        font-weight: 600;
+    }
+
+    /* Form elements */
+    #settings select,
+    #settings input[type="color"] {
+        width: 100%;
+        margin: 10px 0;
+        font-size: 16px;
+        padding: 12px;
+        border-radius: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        background: rgba(255, 255, 255, 0.1);
+        -webkit-backdrop-filter: blur(10px);
+        backdrop-filter: blur(5px);
+
+    }
+
+    #settings label {
+        font-size: 16px;
+        font-weight: 600;
+        margin: 10px 0 5px 0;
+        display: block;
+    }
+
+    /* Font size dropdown - compact display */
+    #font-size {
+        max-height: 150px;
+        overflow-y: auto;
+    }
+
+    /* Radio groups */
+    .radio-group {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        margin: 15px 0;
+    }
+
+    .radio-option {
+        width: 100%;
+        font-size: 16px;
+        padding: 12px;
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+    }
+
+    .radio-option:hover,
+    .radio-option:has(input:checked) {
+        background: rgba(30, 193, 203, 0.2);
+        border-color: #1ec1cb;
+        transform: translateX(5px);
+    }
+
+    .radio-text {
+        font-size: 15px;
+        margin-left: 8px;
+    }
+
+    /* Format info */
+    #format-info small {
+        font-size: 12px;
+        opacity: 0.8;
+    }
+
+    /* Instruction label */
+    #instruction-label {
+        font-size: 16px;
+        text-align: center;
+        padding: 15px;
+        margin: 20px 0;
+        max-width: 355px;
+        width: 100%;
+        line-height: 1.4;
+        background: rgba(30, 193, 203, 0.1);
+        border-radius: 8px;
+        border: 1px solid rgba(30, 193, 203, 0.3);
+    }
+
+    /* Button container */
+    #button-container {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        margin: 30px 0;
+        padding: 0;
+        width: 100%;
+        max-width: 355px;
+        align-items: center;
+    }
+
+    #button-container button {
+        width: 100%;
+        padding: 16px;
+        font-size: 17px;
+        border-radius: 10px;
+        max-width: 300px;
+        font-weight: 600;
+        border: none;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+    #button-container button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Ensure perfect centering */
     #template-upload-container,
     #canvas-container,
     #settings,
@@ -256,271 +589,141 @@
         margin-right: auto;
     }
 
-    /* Ensure canvas is perfectly centered */
-    #canvas-container {
-        text-align: center;
-    }
-
+    /* Fix canvas aspect ratio for mobile */
     #template-canvas {
-        max-width: 100%;
-        height: auto;
+        aspect-ratio: 16/9;
         object-fit: contain;
     }
 }
 
-/* Extra Small Mobile Phones (360px and below) - Galaxy S series, iPhone SE */
+/* ==========================================================================
+   SMALL MOBILE 360px - Galaxy S series, Android phones
+   ========================================================================== */
+
 @media screen and (max-width: 360px) {
-
-    /* Main container - Ultra compact */
-    body {
-        padding: 8px;
-        font-size: 14px;
-        margin: 0;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        min-height: 100vh;
-    }
-
-    /* Title - Compact but readable */
-    h1 {
-        font-size: 2.2rem;
-        /* Scaled for 360px */
-        margin-bottom: 15px;
-        text-align: center;
-        width: 100%;
-        line-height: 1.1;
-    }
-
-    /* Template upload section */
-    #template-upload-container {
-        margin: 15px 0;
-        text-align: center;
-        width: 100%;
-        max-width: 340px;
-        /* Leave 10px margins */
-        padding: 0 10px;
-    }
-
-    #template-upload-btn {
-        font-size: 14px;
-        padding: 12px 20px;
-        width: 100%;
-        max-width: 300px;
-        /* Fit comfortably in 360px */
-        border-radius: 6px;
-        margin: 0 auto;
-        display: block;
-    }
-
-    #drag-drop-hint {
-        font-size: 12px;
-        margin: 15px 0;
-        padding: 0 10px;
-        line-height: 1.3;
-        color: #1ec1cb;
-    }
 
     /* Canvas container - Perfect 360px fit */
     #canvas-container {
-        position: relative;
-        margin: 15px auto;
-        width: 100%;
         max-width: 340px;
-        /* Perfect fit with margins */
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
         padding: 0 10px;
     }
 
     #template-canvas {
-        width: 100%;
         max-width: 320px;
-        /* Ensures it fits in 360px screen */
-        height: auto;
-        border-radius: 8px;
-        box-shadow: 0 3px 12px rgba(0, 0, 0, 0.1);
-        display: block;
-        margin: 0 auto;
+        max-height: 200px;
     }
 
-    /* Canvas overlay for drag & drop */
-    #canvas-overlay {
-        border-radius: 8px;
+    #settings,
+    #download-settings,
+    #button-container {
+        max-width: 340px !important;
     }
 
-    .drag-overlay .drag-message {
-        padding: 20px 15px;
-        text-align: center;
+    #template-upload-btn,
+    #button-container button {
+        max-width: 300px;
     }
 
-    .drag-overlay .drag-message i {
-        font-size: 2.2rem;
-        margin-bottom: 10px;
+    /* Compact spacing for small screens */
+    h1 {
+        font-size: 2.4rem;
     }
 
-    .drag-overlay .drag-message p {
-        font-size: 14px;
-        margin: 8px 0;
-        line-height: 1.3;
+    #drag-drop-hint {
+        font-size: 13px;
     }
 
-    .drag-overlay .drag-message small {
-        font-size: 11px;
-        opacity: 0.8;
-    }
-
-    /* Settings panels - Ultra compact */
     #settings,
     #download-settings {
-        position: static !important;
-        width: 100% !important;
-        max-width: 340px !important;
-        margin: 15px auto !important;
-        left: auto !important;
-        right: auto !important;
-        transform: none !important;
         padding: 15px !important;
-        border-radius: 8px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        margin: 15px auto !important;
+    }
+}
+
+/* ==========================================================================
+   ULTRA SMALL PHONES 320px - iPhone 5/SE
+   ========================================================================== */
+
+@media screen and (max-width: 320px) {
+    h1 {
+        font-size: 2.1rem;
     }
 
-    /* Settings headers */
-    #settings h3,
-    #download-settings h3 {
-        font-size: 16px;
-        margin-bottom: 12px;
-        text-align: center;
-        font-weight: 600;
-    }
-
-    /* Form elements - Optimized for 360px */
-    #settings select,
-    #settings input[type="color"] {
-        width: 100%;
-        margin: 8px 0;
-        font-size: 14px;
-        padding: 10px;
-        border-radius: 6px;
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        background: rgba(255, 255, 255, 0.1);
-        color: white;
-    }
-
-    #settings label {
-        font-size: 14px;
-        font-weight: 600;
-        margin: 8px 0 4px 0;
-        display: block;
-        color: #1ec1cb;
-    }
-
-    /* Font size dropdown - compact display */
-    #font-size {
-        max-height: 150px;
-        overflow-y: auto;
-    }
-
-    /* Radio group - Stack efficiently */
-    .radio-group {
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-        margin: 12px 0;
-    }
-
-    .radio-option {
-        width: 100%;
-        font-size: 14px;
-        padding: 10px;
-        border-radius: 6px;
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        cursor: pointer;
-        transition: background 0.3s ease;
-    }
-
-    .radio-option:hover,
-    .radio-option:has(input:checked) {
-        background: rgba(30, 193, 203, 0.2);
-        border-color: #1ec1cb;
-    }
-
-    .radio-text {
-        font-size: 13px;
-        margin-left: 8px;
-    }
-
-    /* Format info */
-    #format-info small {
-        font-size: 11px;
-        opacity: 0.8;
-    }
-
-    /* Instruction label */
-    #instruction-label {
-        font-size: 14px;
-        text-align: center;
-        padding: 0 10px;
-        margin: 15px 0;
-        max-width: 340px;
-        width: 100%;
-        line-height: 1.3;
-        color: #1ec1cb;
-    }
-
-    /* Button container - Touch-friendly */
+    #canvas-container,
+    #settings,
+    #download-settings,
     #button-container {
+        max-width: 300px !important;
+    }
+
+    #template-canvas {
+        max-width: 280px;
+        max-height: 180px;
+    }
+
+    #template-upload-btn,
+    #button-container button {
+        max-width: 280px;
+        font-size: 15px;
+        padding: 14px;
+    }
+
+    #settings,
+    #download-settings {
+        padding: 12px !important;
+    }
+}
+
+/* ==========================================================================
+   LANDSCAPE ORIENTATION - Mobile phones in landscape
+   ========================================================================== */
+
+@media screen and (max-width: 768px) and (orientation: landscape) {
+    #canvas-container {
         display: flex;
         flex-direction: column;
-        gap: 15px;
-        margin: 25px 0;
-        padding: 0 10px;
-        width: 100%;
-        max-width: 340px;
         align-items: center;
+        max-height: 300px;
     }
 
-    #button-container button {
-        width: 100%;
-        padding: 14px;
-        font-size: 15px;
-        border-radius: 8px;
-        max-width: 320px;
-        font-weight: 600;
-        transition: all 0.3s ease;
+    #template-canvas {
+        max-height: 200px;
+        width: auto;
+        max-width: 400px;
     }
 
-    /* Next/Back buttons */
-    #next-btn,
-    #back-btn {
-        background: linear-gradient(135deg, #1ec1cb 0%, #1a9ca5 100%);
-        border: none;
-        color: white;
+    #settings,
+    #download-settings {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: space-around;
+        align-items: flex-start;
     }
 
-    #next-btn:hover,
-    #back-btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(30, 193, 203, 0.3);
+    #settings>*,
+    #download-settings>* {
+        flex: 1;
+        margin: 5px;
+        min-width: 120px;
     }
 
-    /* File upload button */
-    #file-upload-btn {
-        background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
-        border: none;
-        color: white;
+    h1 {
+        font-size: 2.2rem;
+        margin: 10px 0;
     }
+}
 
-    /* Ensure no horizontal scroll */
+/* ==========================================================================
+   ADDITIONAL MOBILE IMPROVEMENTS
+   ========================================================================== */
+
+/* Ensure no horizontal scroll on mobile */
+@media screen and (max-width: 768px) {
     * {
-        box-sizing: border-box;
         max-width: 100%;
     }
 
-    /* Hide any potential overflow */
     html,
     body {
         overflow-x: hidden;
@@ -542,44 +745,61 @@
         text-align: center;
     }
 
-    #template-canvas {
-        object-fit: contain;
-        max-height: 200px;
-        /* Prevent canvas from being too tall on 360px */
-    }
-
-    /* Compact spacing for small screens */
-    h1+#template-upload-container {
-        margin-top: 10px;
-    }
-
-    #drag-drop-hint+#canvas-container {
-        margin-top: 10px;
+    /* Smooth transitions for better mobile experience */
+    #template-canvas,
+    #settings,
+    #download-settings,
+    .radio-option,
+    button {
+        transition: all 0.3s ease;
     }
 }
 
-/* Ultra small phones (320px and below) - iPhone 5/SE */
-@media screen and (max-width: 320px) {
-    h1 {
-        font-size: 1.9rem;
-    }
+/* ==========================================================================
+   STEP 2 LAYOUT FIXES - When settings are visible
+   ========================================================================== */
 
-    #canvas-container,
-    #settings,
-    #download-settings,
-    #button-container {
-        max-width: 300px !important;
+@media screen and (max-width: 768px) {
+
+    /* Ensure settings panels don't overlap canvas on mobile */
+    #canvas-container {
+        display: flex;
+        flex-direction: column;
     }
 
     #template-canvas {
-        max-width: 280px;
-        max-height: 180px;
+        order: 1;
+        margin-bottom: 20px;
     }
 
-    #template-upload-btn,
-    #button-container button {
-        max-width: 280px;
-        font-size: 14px;
-        padding: 12px;
+    /* Force vertical layout when settings are visible */
+    #settings,
+    #download-settings {
+        position: static !important;
+        width: 100% !important;
+        margin: 15px auto !important;
+        left: auto !important;
+        right: auto !important;
+        top: auto !important;
+        bottom: auto !important;
+        transform: none !important;
+        display: block !important;
+    }
+
+    /* Ensure proper stacking order */
+    #canvas-container {
+        z-index: 1;
+    }
+
+    #settings {
+        z-index: 2;
+    }
+
+    #download-settings {
+        z-index: 3;
+    }
+
+    #button-container {
+        z-index: 4;
     }
 }

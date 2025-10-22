@@ -104,7 +104,6 @@ h3 {
     font-weight: bold;
     color: #1ec1cb;
     font-style: italic;
-    /* opacity: 0.8; */
 }
 
 #canvas-container {
@@ -402,16 +401,4 @@ h3 {
 /* Names file input */
 #names-file {
     display: none;
-}
-
-/* Responsive Design */
-@media (max-width: 1200px) {
-    #settings {
-        left: -260px;
-        width: 200px;
-    }
-
-    #download-settings {
-        width: 200px;
-    }
 }
