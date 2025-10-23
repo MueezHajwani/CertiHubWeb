@@ -371,7 +371,7 @@ html {
     /* MOBILE HAMBURGER MENU - Full width coverage */
     .mobile-nav {
         display: block !important;
-        position: fixed;
+        position: absolute;
         top: 20px;
         right: 20px;
         z-index: 2000;
@@ -724,6 +724,7 @@ html {
     }
 
     #drag-drop-hint {
+        font-size: 1.4rem;
         margin: 2px 0;
         padding: 0 15px;
         line-height: 1.4;
