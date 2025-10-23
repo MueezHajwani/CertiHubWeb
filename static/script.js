@@ -227,8 +227,6 @@ function setupMobileMode() {
   // Skip normal dragging flow
   upIn.hidden = upBtn.hidden = true;
   dragLi.textContent = "Drag the name up/down to position it";
-  dragLi.style.fontSize = "18px";
-  dragLi.style.paddingTop = "20px";
   instr.style.display = "none";
   
   // Show buttons immediately

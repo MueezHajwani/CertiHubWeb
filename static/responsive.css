@@ -33,23 +33,60 @@ html {
         overflow-x: hidden;
     }
 
-    /* TITLE - Large responsive heading */
+    /* LAYOUT ORDER FIX - Proper element sequence */
+    h1 {
+        order: 1;
+    }
+
+    #template-upload-container {
+        order: 2;
+    }
+
+    #canvas-container {
+        order: 3;
+    }
+
+    #instruction-label {
+        order: 4;
+    }
+
+    #settings {
+        order: 5;
+    }
+
+    #download-settings {
+        order: 6;
+    }
+
+    #button-container {
+        order: 7;
+    }
+
+    /* TITLE - PUSHED DOWN FROM CORNER BUTTONS */
     h1 {
         font-size: 3rem;
+        margin-top: 120px !important;
+        /* PUSH DOWN FROM CORNER BUTTONS */
         margin-bottom: 25px;
         text-align: center;
         width: 100%;
         line-height: 1.1;
-        order: 0;
+        display: block !important;
+        color: #1ec1cb !important;
+        position: relative !important;
+        z-index: 10 !important;
     }
 
-    /* TEMPLATE UPLOAD SECTION - File upload area */
+    /* TEMPLATE UPLOAD SECTION - PUSHED DOWN WITH MORE SPACING */
     #template-upload-container {
-        margin: 25px 0;
+        margin: 40px 0 !important;
+        /* INCREASED MARGIN */
         text-align: center;
         width: 100%;
         max-width: 500px;
-        order: 1;
+        position: relative !important;
+        z-index: 2 !important;
+        display: block !important;
     }
 
     #template-upload-btn {
@@ -58,62 +95,79 @@ html {
         width: 100%;
         max-width: 350px;
         border-radius: 8px;
-        display: block;
+        display: block !important;
         margin: 0 auto;
     }
 
     #drag-drop-hint {
-        font-size: 14px;
+        font-size: 1.5rem;
         margin: -2px 0;
         padding: 0 15px;
         line-height: 1.4;
         text-align: center;
+        display: block !important;
     }
 
-    /* CANVAS CONTAINER - Main drawing area */
+    /* CANVAS CONTAINER - PUSHED DOWN WITH MORE SPACING */
     #canvas-container {
-        position: relative;
-        margin: 25px auto;
+        position: relative !important;
+        margin: 40px auto !important;
+        /* INCREASED MARGIN */
         width: 100%;
         max-width: 500px;
-        display: flex;
+        display: flex !important;
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        order: 2;
+        top: auto !important;
+        left: auto !important;
+        right: auto !important;
+        bottom: auto !important;
+        transform: none !important;
+        z-index: 1 !important;
     }
 
     #template-canvas {
         width: 100%;
         height: auto;
+        min-height: 200px !important;
         border-radius: 10px;
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        display: block;
+        display: block !important;
         margin: 0 auto;
         object-fit: contain;
+        background: #2b2b2b;
+        border: 2px solid white;
     }
 
-    /* SETTINGS PANELS - Font and download options */
+    /* INSTRUCTION LABEL - Helper text */
+    #instruction-label {
+        font-size: 16px;
+        text-align: center;
+        padding: 0 15px;
+        margin: 30px 0;
+        /* INCREASED MARGIN */
+        max-width: 500px;
+        width: 100%;
+    }
+
+    /* SETTINGS PANELS - PUSHED DOWN WITH MORE SPACING */
     #settings,
     #download-settings {
         position: static !important;
         width: 100% !important;
         max-width: 500px !important;
-        margin: 25px auto !important;
+        margin: 40px auto !important;
+        /* INCREASED MARGIN */
         left: auto !important;
         right: auto !important;
+        top: auto !important;
+        bottom: auto !important;
         transform: none !important;
         padding: 20px !important;
         border-radius: 10px;
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    }
-
-    #settings {
-        order: 3;
-    }
-
-    #download-settings {
-        order: 4;
+        display: block !important;
     }
 
     /* SETTINGS HEADERS - Panel titles */
@@ -166,27 +220,17 @@ html {
         border-color: #1ec1cb;
     }
 
-    /* INSTRUCTION LABEL - Helper text */
-    #instruction-label {
-        font-size: 16px;
-        text-align: center;
-        padding: 0 15px;
-        margin: 20px 0;
-        max-width: 500px;
-        width: 100%;
-    }
-
-    /* BUTTON CONTAINER - Action buttons */
+    /* BUTTON CONTAINER - PUSHED DOWN WITH MORE SPACING */
     #button-container {
         display: flex;
         flex-direction: column;
         gap: 20px;
-        margin: 35px 0;
+        margin: 50px 0;
+        /* INCREASED MARGIN */
         padding: 0 20px;
         width: 100%;
         max-width: 500px;
         align-items: center;
-        order: 5;
     }
 
     #button-container button {
@@ -198,40 +242,6 @@ html {
         font-weight: 600;
         border: none;
         transition: all 0.3s ease;
-    }
-
-    /* STEP 2 LAYOUT - When settings are visible */
-    body.step2-active,
-    body:has(#settings[style*="block"]) {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        padding: 10px;
-    }
-
-    body.step2-active #canvas-container,
-    body:has(#settings[style*="block"]) #canvas-container {
-        order: 2;
-        position: static !important;
-        margin: 20px auto;
-    }
-
-    body.step2-active #settings,
-    body:has(#settings[style*="block"]) #settings {
-        order: 3;
-        position: static !important;
-    }
-
-    body.step2-active #download-settings,
-    body:has(#download-settings[style*="block"]) #download-settings {
-        order: 4;
-        position: static !important;
-    }
-
-    body.step2-active #button-container,
-    body:has(#settings[style*="block"]) #button-container {
-        order: 5;
-        margin: 30px auto;
     }
 
     /* GENERAL MOBILE IMPROVEMENTS - Better UX */
@@ -266,30 +276,6 @@ html {
         transition: all 0.3s ease;
     }
 
-    /* STEP 2 LAYOUT FIXES - Settings visibility handling */
-    #canvas-container {
-        display: flex;
-        flex-direction: column;
-    }
-
-    #template-canvas {
-        order: 1;
-        margin-bottom: 20px;
-    }
-
-    #settings,
-    #download-settings {
-        position: static !important;
-        width: 100% !important;
-        margin: 15px auto !important;
-        left: auto !important;
-        right: auto !important;
-        top: auto !important;
-        bottom: auto !important;
-        transform: none !important;
-        display: block !important;
-    }
-
     /* Z-INDEX MANAGEMENT - Layer stacking */
     #canvas-container {
         z-index: 1;
@@ -306,49 +292,236 @@ html {
     #button-container {
         z-index: 4;
     }
-}
 
-/* ==========================================================================
-   LANDSCAPE ORIENTATION (768px and below) - Horizontal phone layouts
-   ========================================================================== */
+    /* CORNER NAVIGATION RESPONSIVE - Mobile corner buttons */
+    .corner-nav-buttons {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 1000;
+    }
 
-@media screen and (max-width: 768px) and (orientation: landscape) {
-
-    /* LANDSCAPE CANVAS - Optimized for horizontal screens */
-    #canvas-container {
+    .corner-button {
+        position: absolute;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #1ec1cb, #00a8ff);
+        color: white;
         display: flex;
         flex-direction: column;
         align-items: center;
-        max-height: 300px;
+        justify-content: center;
+        cursor: pointer;
+        pointer-events: auto;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(30, 193, 203, 0.3);
+        font-size: 10px;
+        font-weight: 600;
     }
 
-    #template-canvas {
-        max-height: 200px;
-        width: auto;
-        max-width: 400px;
+    .corner-button:hover {
+        transform: scale(1.1);
+        box-shadow: 0 6px 25px rgba(30, 193, 203, 0.5);
+        background: linear-gradient(135deg, #00a8ff, #8e44ad);
     }
 
-    /* LANDSCAPE SETTINGS - Side-by-side layout */
-    #settings,
-    #download-settings {
+    .corner-button i {
+        font-size: 16px;
+        margin-bottom: 2px;
+    }
+
+    .corner-button span {
+        font-size: 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        text-align: center;
+        line-height: 1.1;
+    }
+
+    /* MOBILE POSITIONING - Vertical stack on sides */
+    .left-top {
+        top: 15px;
+        left: 15px;
+    }
+
+    .left-bottom {
+        top: 85px;
+        left: 15px;
+    }
+
+    .right-top {
+        top: 15px;
+        right: 15px;
+    }
+
+    .right-bottom {
+        top: 85px;
+        right: 15px;
+    }
+
+    /* MODAL RESPONSIVE - Smaller modals for mobile */
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.6);
+        -webkit-backdrop-filter: blur(3px);
+        backdrop-filter: blur(3px);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 2000;
+        opacity: 0;
+        transition: all 0.3s ease;
+    }
+
+    .modal-overlay.active {
         display: flex;
-        flex-direction: row;
-        flex-wrap: wrap;
-        justify-content: space-around;
-        align-items: flex-start;
+        opacity: 1;
     }
 
-    #settings>*,
-    #download-settings>* {
-        flex: 1;
-        margin: 5px;
-        min-width: 120px;
+    .modal-content {
+        background: rgba(17, 46, 66, 0.95);
+        border: 1px solid rgba(30, 193, 203, 0.3);
+        border-radius: 15px;
+        max-width: 90%;
+        width: 90%;
+        max-height: 80vh;
+        position: relative;
+        transform: scale(0.7);
+        transition: all 0.3s ease;
+        box-shadow: 0 10px 40px rgba(30, 193, 203, 0.2);
+        -webkit-backdrop-filter: blur(20px);
+        backdrop-filter: blur(20px);
+
+        /* Custom scrollbar styling */
+        overflow-y: auto;
+        /* Firefox */
+        -ms-overflow-style: none;
+        /* IE and Edge */
     }
 
-    /* LANDSCAPE TITLE - Smaller for horizontal space */
-    h1 {
-        font-size: 2.2rem;
-        margin: 10px 0;
+    /* Hide scrollbar for webkit browsers */
+    .modal-content::-webkit-scrollbar {
+        width: 0px;
+        background: transparent;
+    }
+
+    .modal-overlay.active .modal-content {
+        transform: scale(1);
+    }
+
+    .modal-close {
+        position: absolute;
+        top: 10px;
+        right: 15px;
+        font-size: 25px;
+        color: #1ec1cb;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        z-index: 10;
+    }
+
+    .modal-close:hover {
+        color: #ff4757;
+        transform: rotate(90deg);
+    }
+
+    .modal-body {
+        padding: 35px 20px 20px;
+        color: white;
+        line-height: 1.6;
+
+        /* Hide scrollbar but keep functionality */
+        overflow-y: auto;
+
+        /* Firefox */
+        -ms-overflow-style: none;
+        /* IE and Edge */
+    }
+
+    .modal-body::-webkit-scrollbar {
+        width: 0px;
+        background: transparent;
+    }
+
+    .modal-body h2 {
+        color: #1ec1cb;
+        font-size: 1.8rem;
+        margin-bottom: 20px;
+        text-align: center;
+        background: linear-gradient(135deg, #1ec1cb, #00a8ff);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .modal-body p {
+        margin-bottom: 15px;
+        font-size: 14px;
+    }
+
+    .modal-body .feature-list {
+        list-style: none;
+        padding: 0;
+        margin: 15px 0;
+    }
+
+    .modal-body .feature-list li {
+        padding: 8px 0;
+        position: relative;
+        padding-left: 25px;
+        font-size: 13px;
+    }
+
+    .modal-body .feature-list li:before {
+        content: "✓";
+        position: absolute;
+        left: 0;
+        color: #1ec1cb;
+        font-weight: bold;
+        font-size: 16px;
+    }
+
+    .creator-card {
+        background: rgba(30, 193, 203, 0.1);
+        border-radius: 10px;
+        padding: 15px;
+        margin: 15px 0;
+        text-align: center;
+        border: 1px solid rgba(30, 193, 203, 0.2);
+        transition: all 0.3s ease;
+    }
+
+    .creator-card:hover {
+        background: rgba(30, 193, 203, 0.15);
+        transform: translateY(-2px);
+    }
+
+    .creator-card .name {
+        font-size: 1.1rem;
+        font-weight: bold;
+        color: #1ec1cb;
+        margin-bottom: 5px;
+    }
+
+    .creator-card .role {
+        color: #00a8ff;
+        font-size: 12px;
+        margin-bottom: 8px;
+        font-weight: 600;
+    }
+
+    .creator-card .bio {
+        font-size: 12px;
+        opacity: 0.9;
+        line-height: 1.4;
     }
 }
 
@@ -375,13 +548,13 @@ html {
     }
 
     #template-canvas {
+        width: auto;
         margin-top: 10px;
         border-radius: 8px;
         max-height: 250px;
     }
 
     #drag-drop-hint {
-        font-size: 14px;
         margin: 2px 0;
         padding: 0 15px;
         line-height: 1.4;
@@ -516,7 +689,7 @@ html {
     }
 
     #template-canvas {
-        width: 100%;
+        width: auto;
         max-width: 355px;
         height: auto;
         max-height: 220px;
@@ -750,6 +923,7 @@ html {
     }
 
     #template-canvas {
+        width: auto;
         max-width: 320px;
         max-height: 200px;
     }
