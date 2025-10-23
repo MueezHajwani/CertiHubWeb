@@ -35,7 +35,7 @@ let fontsLoadingPromise = null;
 
 // 📱 NEW: Check if device is mobile (480px and below)
 function checkMobile() {
-  isMobile = window.innerWidth <= 480;
+  isMobile = window.innerWidth <= 768;
   return isMobile;
 }
 
@@ -92,7 +92,7 @@ for (let i = 1; i <= 120; i++) {
   const o = document.createElement("option");
   o.value = i;
   o.text = i;
-  if (i === 40) o.selected = true;
+  if (i === 50) o.selected = true;
   sizeSel.appendChild(o);
 }
 
