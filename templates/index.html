@@ -17,9 +17,45 @@
     <!-- Link to external CSS file -->
     <link rel="stylesheet" href="/static/style.css" />
     <link rel="stylesheet" href="/static/responsive.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
   </head>
   <body>
     <!-- Your HTML continues here -->
+    <!-- Corner Navigation Buttons -->
+    <div class="corner-nav-buttons">
+      <!-- Left Side -->
+      <div class="corner-button left-top" id="about-btn">
+        <i class="fas fa-info"></i>
+        <span>About</span>
+      </div>
+      <div class="corner-button left-bottom" id="creators-btn">
+        <i class="fas fa-users"></i>
+        <span>Creators</span>
+      </div>
+
+      <!-- Right Side -->
+      <div class="corner-button right-top" id="projects-btn">
+        <i class="fas fa-rocket"></i>
+        <span>Projects</span>
+      </div>
+      <div class="corner-button right-bottom" id="contact-btn">
+        <i class="fas fa-envelope"></i>
+        <span>Contact</span>
+      </div>
+    </div>
+
+    <!-- Modal Overlay -->
+    <div class="modal-overlay" id="modal-overlay">
+      <div class="modal-content" id="modal-content">
+        <div class="modal-close" id="modal-close">&times;</div>
+        <div class="modal-body" id="modal-body">
+          <!-- Content will be inserted here -->
+        </div>
+      </div>
+    </div>
 
     <h1>CertiHub</h1>
     <div id="template-upload-container">

@@ -507,3 +507,136 @@ namesIn.onchange = async () => {
   fileB.textContent = format === "pdf" ? "Generate PDF" : "Generate PNGs";
   fileB.disabled = false;
 };
+
+/* ===== CORNER NAVIGATION & MODAL SYSTEM ===== */
+
+document.addEventListener('DOMContentLoaded', function() {
+  const modalOverlay = document.getElementById('modal-overlay');
+  const modalContent = document.getElementById('modal-content');
+  const modalBody = document.getElementById('modal-body');
+  const modalClose = document.getElementById('modal-close');
+  
+  const aboutBtn = document.getElementById('about-btn');
+  const creatorsBtn = document.getElementById('creators-btn');
+  const projectsBtn = document.getElementById('projects-btn');
+  const contactBtn = document.getElementById('contact-btn');
+
+  // Modal content templates
+  const modalContents = {
+    about: `
+      <h2>About CertiHub</h2>
+      <p>🎓 <strong>CertiHub</strong> is a powerful, easy-to-use certificate generator that helps you create professional certificates in minutes!</p>
+      
+      <ul class="feature-list">
+        <li>Upload any certificate template</li>
+        <li>Drag and position text areas</li>
+        <li>Choose from 25+ professional fonts</li>
+        <li>Bulk generate certificates from CSV/TXT files</li>
+        <li>Export as PDF or PNG images</li>
+        <li>Mobile-friendly responsive design</li>
+        <li>Completely free to use</li>
+      </ul>
+      
+      <p>Perfect for schools, organizations, workshops, and events. Generate hundreds of certificates with just a few clicks!</p>
+      
+      <p><strong>Version:</strong> 2.0 | <strong>Last Updated:</strong> October 2025</p>
+    `,
+    
+    creators: `
+      <h2>Meet the Creators</h2>
+      <p>CertiHub is proudly created by a passionate team of developers:</p>
+      
+      <div class="creator-card">
+        <div class="name">🚀 Development Team</div>
+        <div class="role">Full-Stack Developers</div>
+        <div class="bio">Passionate developers focused on creating useful tools that make certificate generation simple and efficient.</div>
+      </div>
+      
+      <div class="creator-card">
+        <div class="name">🎨 Design Team</div>
+        <div class="role">UI/UX Designers</div>
+        <div class="bio">Crafting beautiful, intuitive interfaces that make complex tasks feel effortless.</div>
+      </div>
+      
+      <p>💝 Built with love using Flask, JavaScript, and modern web technologies.</p>
+      <p>🌟 Thank you for using CertiHub and supporting our work!</p>
+    `,
+    
+    projects: `
+      <h2>Other Projects</h2>
+      <p>🚀 Explore more useful tools and projects:</p>
+      
+      <ul class="feature-list">
+        <li><strong>QR Generator Pro</strong> - Advanced QR code generator</li>
+        <li><strong>Image Optimizer</strong> - Compress and optimize images</li>
+        <li><strong>Text Utils</strong> - Collection of text processing tools</li>
+        <li><strong>Color Palette Generator</strong> - Create beautiful color schemes</li>
+        <li><strong>Invoice Generator</strong> - Professional invoice creator</li>
+        <li><strong>Resume Builder</strong> - Modern resume templates</li>
+      </ul>
+      
+      <p>🌐 More projects coming soon! Stay tuned for updates.</p>
+      <p>💡 Have an idea for a useful tool? Let us know!</p>
+    `,
+    
+    contact: `
+      <h2>Get in Touch</h2>
+      <p>📬 We'd love to hear from you! Reach out for support, feedback, or collaboration:</p>
+      
+      <div class="creator-card">
+        <div class="name">📧 Email Support</div>
+        <div class="role">General Inquiries</div>
+        <div class="bio">support@certihub.com<br>We typically respond within 24 hours</div>
+      </div>
+      
+      <div class="creator-card">
+        <div class="name">🐛 Bug Reports</div>
+        <div class="role">Technical Issues</div>
+        <div class="bio">bugs@certihub.com<br>Help us improve CertiHub</div>
+      </div>
+      
+      <div class="creator-card">
+        <div class="name">💡 Feature Requests</div>
+        <div class="role">Suggestions & Ideas</div>
+        <div class="bio">features@certihub.com<br>Share your ideas with us</div>
+      </div>
+      
+      <p>🌟 <strong>Love CertiHub?</strong> Share it with your friends and colleagues!</p>
+    `
+  };
+
+  // Function to open modal
+  function openModal(content) {
+    modalBody.innerHTML = modalContents[content];
+    modalOverlay.classList.add('active');
+    document.body.style.overflow = 'hidden'; // Prevent background scroll
+  }
+
+  // Function to close modal
+  function closeModal() {
+    modalOverlay.classList.remove('active');
+    document.body.style.overflow = 'auto'; // Re-enable scroll
+  }
+
+  // Event listeners
+  aboutBtn.addEventListener('click', () => openModal('about'));
+  creatorsBtn.addEventListener('click', () => openModal('creators'));
+  projectsBtn.addEventListener('click', () => openModal('projects'));
+  contactBtn.addEventListener('click', () => openModal('contact'));
+
+  // Close modal events
+  modalClose.addEventListener('click', closeModal);
+  modalOverlay.addEventListener('click', (e) => {
+    if (e.target === modalOverlay) {
+      closeModal();
+    }
+  });
+
+  // Close on Escape key
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modalOverlay.classList.contains('active')) {
+      closeModal();
+    }
+  });
+});
+
