@@ -17,12 +17,12 @@ html {
 }
 
 /* ==========================================================================
-   TABLET AND SMALL DESKTOP (768px and below)
+   TABLET AND SMALL DESKTOP (768px and below) - MAIN RESPONSIVE STYLES
    ========================================================================== */
 
 @media screen and (max-width: 768px) {
 
-    /* Main container adjustments */
+    /* MAIN CONTAINER - Flexbox layout with centered content */
     body {
         padding: 15px;
         font-size: 16px;
@@ -33,7 +33,7 @@ html {
         overflow-x: hidden;
     }
 
-    /* Title */
+    /* TITLE - Large responsive heading */
     h1 {
         font-size: 3rem;
         margin-bottom: 25px;
@@ -43,7 +43,7 @@ html {
         order: 0;
     }
 
-    /* Template upload section */
+    /* TEMPLATE UPLOAD SECTION - File upload area */
     #template-upload-container {
         margin: 25px 0;
         text-align: center;
@@ -70,7 +70,7 @@ html {
         text-align: center;
     }
 
-    /* Canvas container - PERFECT CENTERING */
+    /* CANVAS CONTAINER - Main drawing area */
     #canvas-container {
         position: relative;
         margin: 25px auto;
@@ -93,7 +93,7 @@ html {
         object-fit: contain;
     }
 
-    /* Settings panels - Better mobile layout */
+    /* SETTINGS PANELS - Font and download options */
     #settings,
     #download-settings {
         position: static !important;
@@ -116,7 +116,7 @@ html {
         order: 4;
     }
 
-    /* Settings headers */
+    /* SETTINGS HEADERS - Panel titles */
     #settings h3,
     #download-settings h3 {
         margin-bottom: 15px;
@@ -124,7 +124,7 @@ html {
         font-weight: 600;
     }
 
-    /* Form elements in settings */
+    /* FORM ELEMENTS - Inputs and dropdowns */
     #settings select,
     #settings input[type="color"] {
         width: 100%;
@@ -141,7 +141,7 @@ html {
         display: block;
     }
 
-    /* Radio group adjustments */
+    /* RADIO GROUP - Output format selection */
     .radio-group {
         display: flex;
         flex-direction: column;
@@ -166,7 +166,7 @@ html {
         border-color: #1ec1cb;
     }
 
-    /* Instruction label */
+    /* INSTRUCTION LABEL - Helper text */
     #instruction-label {
         font-size: 16px;
         text-align: center;
@@ -176,7 +176,7 @@ html {
         width: 100%;
     }
 
-    /* Button container */
+    /* BUTTON CONTAINER - Action buttons */
     #button-container {
         display: flex;
         flex-direction: column;
@@ -200,7 +200,7 @@ html {
         transition: all 0.3s ease;
     }
 
-    /* Step 2 layout fixes */
+    /* STEP 2 LAYOUT - When settings are visible */
     body.step2-active,
     body:has(#settings[style*="block"]) {
         display: flex;
@@ -233,13 +233,132 @@ html {
         order: 5;
         margin: 30px auto;
     }
+
+    /* GENERAL MOBILE IMPROVEMENTS - Better UX */
+    * {
+        max-width: 100%;
+    }
+
+    html,
+    body {
+        overflow-x: hidden;
+    }
+
+    #template-upload-container,
+    #canvas-container,
+    #settings,
+    #download-settings,
+    #instruction-label,
+    #button-container {
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    #canvas-container {
+        text-align: center;
+    }
+
+    #template-canvas,
+    #settings,
+    #download-settings,
+    .radio-option,
+    button {
+        transition: all 0.3s ease;
+    }
+
+    /* STEP 2 LAYOUT FIXES - Settings visibility handling */
+    #canvas-container {
+        display: flex;
+        flex-direction: column;
+    }
+
+    #template-canvas {
+        order: 1;
+        margin-bottom: 20px;
+    }
+
+    #settings,
+    #download-settings {
+        position: static !important;
+        width: 100% !important;
+        margin: 15px auto !important;
+        left: auto !important;
+        right: auto !important;
+        top: auto !important;
+        bottom: auto !important;
+        transform: none !important;
+        display: block !important;
+    }
+
+    /* Z-INDEX MANAGEMENT - Layer stacking */
+    #canvas-container {
+        z-index: 1;
+    }
+
+    #settings {
+        z-index: 2;
+    }
+
+    #download-settings {
+        z-index: 3;
+    }
+
+    #button-container {
+        z-index: 4;
+    }
 }
 
 /* ==========================================================================
-   LARGE MOBILE PHONES (480px and below) 
+   LANDSCAPE ORIENTATION (768px and below) - Horizontal phone layouts
+   ========================================================================== */
+
+@media screen and (max-width: 768px) and (orientation: landscape) {
+
+    /* LANDSCAPE CANVAS - Optimized for horizontal screens */
+    #canvas-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        max-height: 300px;
+    }
+
+    #template-canvas {
+        max-height: 200px;
+        width: auto;
+        max-width: 400px;
+    }
+
+    /* LANDSCAPE SETTINGS - Side-by-side layout */
+    #settings,
+    #download-settings {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: space-around;
+        align-items: flex-start;
+    }
+
+    #settings>*,
+    #download-settings>* {
+        flex: 1;
+        margin: 5px;
+        min-width: 120px;
+    }
+
+    /* LANDSCAPE TITLE - Smaller for horizontal space */
+    h1 {
+        font-size: 2.2rem;
+        margin: 10px 0;
+    }
+}
+
+/* ==========================================================================
+   LARGE MOBILE PHONES (480px and below) - Standard mobile devices
    ========================================================================== */
 
 @media screen and (max-width: 480px) {
+
+    /* LARGE MOBILE LAYOUT - Standard phone sizes */
     body {
         padding: 10px;
     }
@@ -249,6 +368,7 @@ html {
         margin-bottom: 20px;
     }
 
+    /* LARGE MOBILE CANVAS - Optimized dimensions */
     #canvas-container {
         max-width: 100%;
         margin: 20px auto;
@@ -268,6 +388,7 @@ html {
         text-align: center;
     }
 
+    /* LARGE MOBILE SETTINGS - Compact panels */
     #settings,
     #download-settings {
         max-width: 100% !important;
@@ -283,7 +404,7 @@ html {
         font-weight: 600;
     }
 
-
+    /* LARGE MOBILE BUTTONS - Touch-friendly size */
     #button-container {
         max-width: 100%;
         padding: 0 15px;
@@ -295,6 +416,7 @@ html {
         padding: 16px;
     }
 
+    /* LARGE MOBILE DRAG OVERLAY - File drop feedback */
     .drag-overlay .drag-message {
         padding: 25px;
     }
@@ -313,11 +435,12 @@ html {
 }
 
 /* ==========================================================================
-   MOBILE 375px WIDTH - iPhone 6/7/8, Galaxy S series
+   MOBILE 375px WIDTH - iPhone 6/7/8, Galaxy S series - Optimized layouts
    ========================================================================== */
 
 @media screen and (max-width: 375px) {
 
+    /* 375PX GLOBAL - Full mobile optimization */
     html,
     body {
         margin: 0;
@@ -335,6 +458,7 @@ html {
         min-height: 100vh;
     }
 
+    /* 375PX TITLE - Perfect size for standard phones */
     h1 {
         font-size: 2.8rem;
         margin: 15px 0 20px 0;
@@ -344,6 +468,7 @@ html {
         line-height: 1.1;
     }
 
+    /* 375PX UPLOAD SECTION - File selection area */
     #template-upload-container {
         margin: 60px 0;
         text-align: center;
@@ -377,6 +502,7 @@ html {
         text-align: center;
     }
 
+    /* 375PX CANVAS - Main drawing area with fixed dimensions */
     #canvas-container {
         position: relative;
         margin: 20px auto;
@@ -402,6 +528,7 @@ html {
         border: 2px solid rgba(30, 193, 203, 0.3);
     }
 
+    /* 375PX DRAG OVERLAY - File drop visual feedback */
     #canvas-overlay {
         position: absolute;
         top: 0;
@@ -438,6 +565,7 @@ html {
         opacity: 1;
     }
 
+    /* 375PX DRAG MESSAGE - Drop file instructions */
     .drag-message {
         text-align: center;
         color: white;
@@ -461,6 +589,7 @@ html {
         opacity: 0.9;
     }
 
+    /* 375PX SETTINGS - Compact configuration panels */
     #settings,
     #download-settings {
         position: static !important;
@@ -489,6 +618,7 @@ html {
         font-weight: 600;
     }
 
+    /* 375PX FORM ELEMENTS - Touch-optimized inputs */
     #settings select,
     #settings input[type="color"] {
         width: 100%;
@@ -514,6 +644,7 @@ html {
         overflow-y: auto;
     }
 
+    /* 375PX RADIO GROUPS - Format selection options */
     .radio-group {
         display: flex;
         flex-direction: column;
@@ -551,6 +682,7 @@ html {
         opacity: 0.8;
     }
 
+    /* 375PX INSTRUCTION LABEL - Helper information */
     #instruction-label {
         font-size: 16px;
         text-align: center;
@@ -564,6 +696,7 @@ html {
         border: 1px solid rgba(30, 193, 203, 0.3);
     }
 
+    /* 375PX BUTTONS - Action button container */
     #button-container {
         display: flex;
         flex-direction: column;
@@ -592,6 +725,7 @@ html {
         box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
     }
 
+    /* 375PX CENTERING - Perfect alignment for all elements */
     #template-upload-container,
     #canvas-container,
     #settings,
@@ -604,10 +738,12 @@ html {
 }
 
 /* ==========================================================================
-   SMALL MOBILE 360px - Galaxy S series, Android phones
+   SMALL MOBILE 360px - Galaxy S series, Android phones - Compact layouts
    ========================================================================== */
 
 @media screen and (max-width: 360px) {
+
+    /* SMALL MOBILE - Compact dimensions for smaller screens */
     #canvas-container {
         max-width: 340px;
         padding: 0 10px;
@@ -645,10 +781,12 @@ html {
 }
 
 /* ==========================================================================
-   ULTRA SMALL PHONES 320px - iPhone 5/SE
+   ULTRA SMALL PHONES 320px - iPhone 5/SE - Minimal layouts
    ========================================================================== */
 
 @media screen and (max-width: 320px) {
+
+    /* ULTRA SMALL - Minimal dimensions for oldest devices */
     h1 {
         font-size: 2.1rem;
     }
@@ -679,146 +817,57 @@ html {
 }
 
 /* ==========================================================================
-   LANDSCAPE ORIENTATION - Mobile phones in landscape
+   TABLET/DESKTOP TRANSITION (769px to 1023px) - Mid-size canvas
    ========================================================================== */
 
-@media screen and (max-width: 768px) and (orientation: landscape) {
-    #canvas-container {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        max-height: 300px;
-    }
+@media screen and (min-width: 769px) and (max-width: 1023px) {
 
+    /* MID-SIZE CANVAS - Fixed desktop dimensions for tablets */
     #template-canvas {
-        max-height: 200px;
-        width: auto;
-        max-width: 400px;
-    }
-
-    #settings,
-    #download-settings {
-        display: flex;
-        flex-direction: row;
-        flex-wrap: wrap;
-        justify-content: space-around;
-        align-items: flex-start;
-    }
-
-    #settings>*,
-    #download-settings>* {
-        flex: 1;
-        margin: 5px;
-        min-width: 120px;
-    }
-
-    h1 {
-        font-size: 2.2rem;
-        margin: 10px 0;
-    }
-}
-
-/* ==========================================================================
-   ADDITIONAL MOBILE IMPROVEMENTS
-   ========================================================================== */
-
-@media screen and (max-width: 768px) {
-    * {
-        max-width: 100%;
-    }
-
-    html,
-    body {
-        overflow-x: hidden;
-    }
-
-    #template-upload-container,
-    #canvas-container,
-    #settings,
-    #download-settings,
-    #instruction-label,
-    #button-container {
-        margin-left: auto;
-        margin-right: auto;
+        width: 900px !important;
+        height: 550px !important;
+        background: #2b2b2b;
+        border: 2px solid white;
+        border-radius: 8px;
+        display: block;
+        margin: 0 auto;
     }
 
     #canvas-container {
+        margin-top: 10px;
         text-align: center;
     }
-
-    #template-canvas,
-    #settings,
-    #download-settings,
-    .radio-option,
-    button {
-        transition: all 0.3s ease;
-    }
 }
 
 /* ==========================================================================
-   STEP 2 LAYOUT FIXES - When settings are visible
+   DESKTOP / LAPTOP (1024px and above) - Full desktop experience
    ========================================================================== */
 
-@media screen and (max-width: 768px) {
-    #canvas-container {
-        display: flex;
-        flex-direction: column;
-    }
-
-    #template-canvas {
-        order: 1;
-        margin-bottom: 20px;
-    }
-
-    #settings,
-    #download-settings {
-        position: static !important;
-        width: 100% !important;
-        margin: 15px auto !important;
-        left: auto !important;
-        right: auto !important;
-        top: auto !important;
-        bottom: auto !important;
-        transform: none !important;
-        display: block !important;
-    }
-
-    #canvas-container {
-        z-index: 1;
-    }
-
-    #settings {
-        z-index: 2;
-    }
-
-    #download-settings {
-        z-index: 3;
-    }
-
-    #button-container {
-        z-index: 4;
-    }
-}
-
-/* ========================================================================== */
-/* DESKTOP / LAPTOP - Reset to original size (1024px and above) */
-/* ========================================================================== */
-
 @media screen and (min-width: 1024px) {
+
+    /* DESKTOP CANVAS - Fixed desktop dimensions */
     #template-canvas {
         width: 900px !important;
         height: 550px !important;
         max-width: 900px !important;
         max-height: 550px !important;
+        background: #2b2b2b;
+        border: 2px solid white;
+        border-radius: 8px;
+        display: block;
+        margin: 0 auto;
     }
 
+    /* DESKTOP LAYOUT - Sidebar positioning */
     #canvas-container {
         position: relative;
         display: inline-block;
         margin-top: 10px;
         max-width: none;
+        text-align: center;
     }
 
+    /* DESKTOP SETTINGS - Absolute positioned sidebars */
     #settings,
     #download-settings {
         position: absolute !important;
