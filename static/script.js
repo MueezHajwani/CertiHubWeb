@@ -23,23 +23,27 @@ let img = new Image(),
   ex,
   ey;
 
-// 📱 NEW: Mobile-specific variables
+// 📱 UPDATED: Mobile-specific variables with horizontal cropping
 let isMobile = false;
 let mobileTextY = 275; // Default center Y position for mobile
 let mobileVerticalDrag = false;
+let mobileHorizontalDrag = false;
+let horizontalDragSide = null; // 'left' or 'right'
+let lastTouchX = 0;
 let lastTouchY = 0;
+let edgeTouchZone = 30; // 30px touch zone for edges
 
 // Font loading tracker
 let fontsLoaded = false;
 let fontsLoadingPromise = null;
 
-// 📱 NEW: Check if device is mobile (480px and below)
+// 📱 UPDATED: Check if device is mobile (768px and below)
 function checkMobile() {
   isMobile = window.innerWidth <= 768;
   return isMobile;
 }
 
-// 📱 NEW: Initialize mobile check
+// 📱 Initialize mobile check
 checkMobile();
 window.addEventListener('resize', checkMobile);
 
@@ -216,17 +220,17 @@ function processTemplateFile(file) {
   cvs.style.cursor = checkMobile() ? "grab" : "crosshair";
 }
 
-// 📱 NEW: Mobile setup function
+// 📱 UPDATED: Mobile setup function with new default values
 function setupMobileMode() {
-  // Auto-set text area for mobile (center horizontally, middle vertically)
-  sx = 50;  // 50px from left
+  // Auto-set text area for mobile with new default values
+  sx = 50;  // 30px from left (CHANGED FROM 50)
   sy = mobileTextY - 30; // Text area top
-  ex = 850; // 850px from left (800px width)
+  ex = 850; // 870px from left (CHANGED FROM 850, gives 840px width)
   ey = mobileTextY + 30; // Text area bottom (60px height)
   
   // Skip normal dragging flow
   upIn.hidden = upBtn.hidden = true;
-  dragLi.textContent = "Drag the name up/down to position it";
+  dragLi.textContent = "Drag vertically to move, touch edges to resize horizontally";
   instr.style.display = "none";
   
   // Show buttons immediately
@@ -262,40 +266,92 @@ upIn.onchange = (e) => {
   processTemplateFile(f);
 };
 
-/* 📱 NEW: Mobile touch events for vertical dragging */
+// 📱 NEW: Function to detect if touch is near horizontal edges
+function detectEdgeTouch(touchX, canvasRect) {
+  const canvasX = (touchX - canvasRect.left) * (900 / canvasRect.width);
+  const leftEdge = sx;
+  const rightEdge = ex;
+  
+  // Check if touch is within edge zones
+  if (Math.abs(canvasX - leftEdge) <= edgeTouchZone) {
+    return 'left';
+  } else if (Math.abs(canvasX - rightEdge) <= edgeTouchZone) {
+    return 'right';
+  }
+  return null;
+}
+
+// 📱 UPDATED: Mobile touch events with horizontal cropping
 cvs.addEventListener('touchstart', (e) => {
   if (!checkMobile() || !img.src) return;
   
   e.preventDefault();
   const touch = e.touches[0];
   const rect = cvs.getBoundingClientRect();
+  lastTouchX = touch.clientX - rect.left;
   lastTouchY = touch.clientY - rect.top;
-  mobileVerticalDrag = true;
-  cvs.style.cursor = "grabbing";
+  
+  // Check if touching horizontal edges
+  const edgeSide = detectEdgeTouch(touch.clientX, rect);
+  
+  if (edgeSide) {
+    // Horizontal edge dragging
+    mobileHorizontalDrag = true;
+    horizontalDragSide = edgeSide;
+    cvs.style.cursor = "ew-resize";
+  } else {
+    // Vertical dragging (center area)
+    mobileVerticalDrag = true;
+    cvs.style.cursor = "ns-resize";
+  }
 });
 
 cvs.addEventListener('touchmove', (e) => {
-  if (!checkMobile() || !mobileVerticalDrag) return;
+  if (!checkMobile() || (!mobileVerticalDrag && !mobileHorizontalDrag)) return;
   
   e.preventDefault();
   const touch = e.touches[0];
   const rect = cvs.getBoundingClientRect();
+  const currentTouchX = touch.clientX - rect.left;
   const currentTouchY = touch.clientY - rect.top;
   
-  // Calculate movement (scaled to canvas coordinates)
-  const deltaY = (currentTouchY - lastTouchY) * (550 / rect.height);
-  
-  // Update mobile text Y position (with bounds)
-  mobileTextY = Math.max(50, Math.min(500, mobileTextY + deltaY));
-  
-  // Update text area coordinates
-  sy = mobileTextY - 30;
-  ey = mobileTextY + 30;
+  if (mobileVerticalDrag) {
+    // Vertical movement (existing logic)
+    const deltaY = (currentTouchY - lastTouchY) * (550 / rect.height);
+    mobileTextY = Math.max(50, Math.min(500, mobileTextY + deltaY));
+    
+    // Update text area Y coordinates
+    sy = mobileTextY - 30;
+    ey = mobileTextY + 30;
+    
+    lastTouchY = currentTouchY;
+    
+  } else if (mobileHorizontalDrag) {
+    // Horizontal resizing (NEW FUNCTIONALITY)
+    const deltaX = (currentTouchX - lastTouchX) * (900 / rect.width);
+    
+    if (horizontalDragSide === 'left') {
+      // Dragging left edge
+      const newSx = sx + deltaX;
+      const minSx = 25; // Minimum left position
+      const maxSx = ex - 50; // Must maintain minimum 50px width
+      
+      sx = Math.max(minSx, Math.min(maxSx, newSx));
+      
+    } else if (horizontalDragSide === 'right') {
+      // Dragging right edge
+      const newEx = ex + deltaX;
+      const minEx = sx + 50; // Must maintain minimum 50px width
+      const maxEx = 875; // Maximum right position
+      
+      ex = Math.max(minEx, Math.min(maxEx, newEx));
+    }
+    
+    lastTouchX = currentTouchX;
+  }
   
   // Update preview
   preview();
-  
-  lastTouchY = currentTouchY;
 });
 
 cvs.addEventListener('touchend', (e) => {
@@ -303,6 +359,8 @@ cvs.addEventListener('touchend', (e) => {
   
   e.preventDefault();
   mobileVerticalDrag = false;
+  mobileHorizontalDrag = false;
+  horizontalDragSide = null;
   cvs.style.cursor = "grab";
 });
 
@@ -355,6 +413,7 @@ function drawRect() {
   ctx.strokeRect(sx, sy, ex - sx, ey - sy);
 }
 
+// 📱 UPDATED: Enhanced preview function with better visual indicators
 async function preview() {
   if (!sx || !ex) return;
   
@@ -382,17 +441,33 @@ async function preview() {
   ctx.setLineDash([]);
   ctx.fillText("Your Name", cx, cy);
   
-  // 📱 Mobile: Show drag indicator
+  // 📱 ENHANCED: Mobile indicators with horizontal resize handles
   if (checkMobile()) {
+    // Main rectangle
     ctx.strokeStyle = "#1ec1cb";
     ctx.setLineDash([4]);
     ctx.strokeRect(sx, sy, ex - sx, ey - sy);
     
-    // Add drag arrows
+    // Vertical drag arrows (existing)
     ctx.fillStyle = "#1ec1cb";
     ctx.font = "20px Arial";
     ctx.fillText("▲", cx + 100, sy - 10);
     ctx.fillText("▼", cx + 100, ey + 25);
+    
+    // NEW: Horizontal resize handles
+    ctx.fillStyle = "#ff6b6b"; // Different color for horizontal handles
+    ctx.font = "16px Arial";
+    
+    // Left handle
+    ctx.fillRect(sx - 3, sy, 6, ey - sy);
+    ctx.fillStyle = "#1ec1cb";
+    ctx.fillText("◀", sx - 15, cy + 5);
+    
+    // Right handle
+    ctx.fillStyle = "#ff6b6b";
+    ctx.fillRect(ex - 3, sy, 6, ey - sy);
+    ctx.fillStyle = "#1ec1cb";
+    ctx.fillText("▶", ex + 8, cy + 5);
   }
 }
 
@@ -417,6 +492,7 @@ nextB.onclick = () => {
   updateFormatDescription();
 };
 
+// 📱 UPDATED: Reset function with new horizontal defaults
 backB.onclick = () => {
   setDiv.style.display =
     downloadSettingsDiv.style.display =
@@ -436,9 +512,14 @@ backB.onclick = () => {
   namesIn.value = "";
   step2 = false;
   
-  // 📱 NEW: Reset mobile state
+  // 📱 UPDATED: Reset mobile state with new defaults
   mobileTextY = 275;
   mobileVerticalDrag = false;
+  mobileHorizontalDrag = false;
+  horizontalDragSide = null;
+  // Reset to new default horizontal values
+  sx = 50;
+  ex = 830;
 };
 
 /* live preview - WAIT for fonts */
