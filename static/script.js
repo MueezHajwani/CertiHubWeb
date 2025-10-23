@@ -424,7 +424,7 @@ backB.onclick = () => {
     fileB.style.display =
     backB.style.display =
       "none";
-  dragLi.textContent = "or Drag & Drop your certificate template here";
+  dragLi.textContent = "Or Drag & Drop your certificate template here";
   dragLi.style.display = "block";
   dragLi.style.fontSize = "";
   dragLi.style.paddingTop = ""; 
