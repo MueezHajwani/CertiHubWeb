@@ -400,7 +400,6 @@ html {
         margin: 0 auto;
         object-fit: contain;
         border: 2px solid rgba(30, 193, 203, 0.3);
-        aspect-ratio: 16/9;
     }
 
     #canvas-overlay {
@@ -811,7 +810,6 @@ html {
         height: 550px !important;
         max-width: 900px !important;
         max-height: 550px !important;
-        aspect-ratio: auto !important;
     }
 
     #canvas-container {
