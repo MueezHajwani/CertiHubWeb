@@ -11,9 +11,12 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Anton&family=Arimo:wght@400;700&family=Ballet&family=Bebas+Neue&family=Cabin:wght@400;700&family=DM+Sans:wght@400;700&family=Fira+Sans:wght@400;700&family=Heebo:wght@400;700&family=Inter:wght@400;700&family=Josefin+Sans:wght@400;700&family=Karla:wght@400;700&family=Lato:wght@400;700&family=Libre+Baskerville:wght@400;700&family=Merriweather:wght@400;700&family=Montserrat:wght@400;700&family=Mukta:wght@400;700&family=Noto+Sans:wght@400;700&family=Nunito:wght@400;700&family=Open+Sans:wght@400;700&family=Orbitron:wght@400;700;900&family=Oswald:wght@400;700&family=Playfair+Display:wght@400;700&family=Poppins:wght@400;600;700&family=PT+Sans:wght@400;700&family=Raleway:wght@400;700&family=Roboto:wght@400;700&family=Roboto+Slab:wght@400;700&family=Ubuntu:wght@400;700&family=Work+Sans:wght@400;700&display=block"
+      href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Allura&family=Anton&family=Arimo:wght@400;700&family=Ballet&family=Bebas+Neue&family=Bree+Serif&family=Cabin:wght@400;700&family=DM+Sans:wght@400;700&family=Fira+Sans:wght@400;700&family=Great+Vibes&family=Heebo:wght@400;700&family=Inter:wght@400;700&family=Josefin+Sans:wght@400;700&family=Karla:wght@400;700&family=Lato:wght@400;700&family=Libre+Baskerville:wght@400;700&family=Merriweather:wght@400;700&family=Montserrat:wght@400;700&family=Mukta:wght@400;700&family=Noto+Sans:wght@400;700&family=Nunito:wght@400;700&family=Open+Sans:wght@400;700&family=Orbitron:wght@400;700;900&family=Oswald:wght@400;700&family=Pacifico&family=Playfair+Display:wght@400;700&family=Poppins:wght@400;600;700&family=PT+Sans:wght@400;700&family=Raleway:wght@400;700&family=Righteous&family=Roboto:wght@400;700&family=Roboto+Slab:wght@400;700&family=Ubuntu:wght@400;700&family=Work+Sans:wght@400;700&display=block"
       rel="stylesheet"
     />
+    <!-- If you rename to CertihubLogo.png -->
+    <link rel="icon" type="image/png" href="/static/images/certihub-logo.png" />
+
     <!-- Link to external CSS file -->
     <link rel="stylesheet" href="/static/style.css" />
     <link rel="stylesheet" href="/static/responsive.css" />
@@ -94,9 +97,7 @@
     <div id="template-upload-container">
       <button id="template-upload-btn">Choose Template</button>
       <input id="template-upload" type="file" accept=".png,.jpg,.jpeg" hidden />
-      <div id="drag-drop-hint">
-        or Drag & Drop your certificate template here
-      </div>
+      <div id="drag-drop-hint">or Drag & Drop your certificate template here</div>
     </div>
     <div id="canvas-container">
       <canvas id="template-canvas"></canvas>
@@ -114,14 +115,21 @@
         <h3>Font Settings</h3>
         <label>Font Style:</label>
         <select id="font-style">
+          <option value="Alex Brush">Alex Brush</option>
+          <!-- NEW -->
+          <option value="Allura">Allura</option>
+          <!-- NEW -->
           <option value="Anton" selected>Anton (Default)</option>
           <option value="Arimo">Arimo</option>
-          <option value="Orbitron">Orbitron</option>
           <option value="Ballet">Ballet</option>
           <option value="Bebas Neue">Bebas Neue</option>
+          <option value="Bree Serif">Bree Serif</option>
+          <!-- NEW -->
           <option value="Cabin">Cabin</option>
           <option value="DM Sans">DM Sans</option>
           <option value="Fira Sans">Fira Sans</option>
+          <option value="Great Vibes">Great Vibes</option>
+          <!-- NEW -->
           <option value="Heebo">Heebo</option>
           <option value="Inter">Inter</option>
           <option value="Josefin Sans">Josefin Sans</option>
@@ -134,16 +142,21 @@
           <option value="Noto Sans">Noto Sans</option>
           <option value="Nunito">Nunito</option>
           <option value="Open Sans">Open Sans</option>
+          <option value="Orbitron">Orbitron</option>
           <option value="Oswald">Oswald</option>
+          <option value="Pacifico">Pacifico</option>
+          <!-- NEW -->
           <option value="Playfair Display">Playfair Display</option>
           <option value="Poppins">Poppins</option>
           <option value="PT Sans">PT Sans</option>
           <option value="Raleway">Raleway</option>
-          <option value="Roboto Slab">Roboto Slab</option>
+          <option value="Righteous">Righteous</option>
           <option value="Roboto">Roboto</option>
+          <option value="Roboto Slab">Roboto Slab</option>
           <option value="Ubuntu">Ubuntu</option>
           <option value="Work Sans">Work Sans</option>
         </select>
+
         <label>Font Size:</label>
         <select id="font-size"></select>
         <label>Font Color:</label>
@@ -168,9 +181,7 @@
         </div>
 
         <div id="format-info">
-          <small id="format-description"
-            >Single PDF with all certificates</small
-          >
+          <small id="format-description">Single PDF with all certificates</small>
         </div>
       </div>
     </div>

@@ -14,36 +14,43 @@ FONTS_DIR = os.path.join(os.path.dirname(__file__), '..', 'static', 'fonts')
 
 # Font mapping from Google Font names to local TTF files
 FONT_MAP = {
+    "Alex Brush": "AlexBrush.ttf",           # NEW (no spaces)
+    "Allura": "Allura.ttf",                  # NEW (no spaces)
     "Anton": "Anton.ttf",
     "Arimo": "Arimo.ttf",
-    "Orbitron": "Orbitron-VariableFont_wght.ttf",
     "Ballet": "Ballet.ttf",
-    "Bebas Neue": "Bebas Neue.ttf",
+    "Bebas Neue": "Bebas Neue.ttf",          # EXISTING (has spaces)
+    "Bree Serif": "BreeSerif.ttf",           # NEW (no spaces)
     "Cabin": "Cabin.ttf",
-    "DM Sans": "DM Sans.ttf",
-    "Fira Sans": "Fira Sans.ttf",
+    "DM Sans": "DM Sans.ttf",                # EXISTING (has spaces)
+    "Fira Sans": "Fira Sans.ttf",            # EXISTING (has spaces)
+    "Great Vibes": "GreatVibes.ttf",         # NEW (no spaces)
     "Heebo": "Heebo.ttf",
     "Inter": "Inter.ttf",
-    "Josefin Sans": "Josefin Sans.ttf",
+    "Josefin Sans": "Josefin Sans.ttf",      # EXISTING (has spaces)
     "Karla": "Karla.ttf",
     "Lato": "Lato.ttf",
-    "Libre Baskerville": "Libre Baskerville.ttf",
+    "Libre Baskerville": "Libre Baskerville.ttf",  # EXISTING (has spaces)
     "Merriweather": "Merriweather.ttf",
     "Montserrat": "Montserrat.ttf",
     "Mukta": "Mukta.ttf",
-    "Noto Sans": "Noto Sans.ttf",
+    "Noto Sans": "Noto Sans.ttf",            # EXISTING (has spaces)
     "Nunito": "Nunito.ttf",
-    "Open Sans": "Open Sans.ttf",
+    "Open Sans": "Open Sans.ttf",            # EXISTING (has spaces)
+    "Orbitron": "Orbitron-VariableFont_wght.ttf",
     "Oswald": "Oswald.ttf",
-    "Playfair Display": "Playfair Display.ttf",
+    "Pacifico": "Pacifico.ttf",              # NEW (no spaces)
+    "Playfair Display": "Playfair Display.ttf",  # EXISTING (has spaces)
     "Poppins": "Poppins.ttf",
-    "PT Sans": "PT Sans.ttf",
+    "PT Sans": "PT Sans.ttf",                # EXISTING (has spaces)
     "Raleway": "Raleway.ttf",
-    "Roboto Slab": "Roboto Slab.ttf",
+    "Righteous": "Righteous.ttf",
     "Roboto": "Roboto.ttf",
+    "Roboto Slab": "Roboto Slab.ttf",        # EXISTING (has spaces)
     "Ubuntu": "Ubuntu.ttf",
-    "Work Sans": "Work Sans.ttf"
+    "Work Sans": "Work Sans.ttf"             # EXISTING (has spaces)
 }
+
 
 # Global font cache to store loaded fonts
 FONT_CACHE = {}
