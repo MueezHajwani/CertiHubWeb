@@ -45,7 +45,7 @@ function checkMobile() {
 
 // 📱 Initialize mobile check
 checkMobile();
-window.addEventListener('resize', checkMobile);
+window.addEventListener("resize", checkMobile);
 
 // Force load all fonts on page load
 function forceLoadAllFonts() {
@@ -54,36 +54,62 @@ function forceLoadAllFonts() {
   }
 
   const fontList = [
-    'Anton', 'Arimo', 'Orbitron', 'Ballet', 'Bebas Neue', 'Cabin',
-    'DM Sans', 'Fira Sans', 'Heebo', 'Inter', 'Josefin Sans', 'Karla',
-    'Lato', 'Libre Baskerville', 'Merriweather', 'Montserrat', 'Mukta',
-    'Noto Sans', 'Nunito', 'Open Sans', 'Oswald', 'Playfair Display',
-    'Poppins', 'PT Sans', 'Raleway', 'Roboto Slab', 'Roboto', 'Ubuntu', 'Work Sans'
+    "Anton",
+    "Arimo",
+    "Orbitron",
+    "Ballet",
+    "Bebas Neue",
+    "Cabin",
+    "DM Sans",
+    "Fira Sans",
+    "Heebo",
+    "Inter",
+    "Josefin Sans",
+    "Karla",
+    "Lato",
+    "Libre Baskerville",
+    "Merriweather",
+    "Montserrat",
+    "Mukta",
+    "Noto Sans",
+    "Nunito",
+    "Open Sans",
+    "Oswald",
+    "Playfair Display",
+    "Poppins",
+    "PT Sans",
+    "Raleway",
+    "Roboto Slab",
+    "Roboto",
+    "Ubuntu",
+    "Work Sans",
   ];
 
-  if ('fonts' in document) {
+  if ("fonts" in document) {
     const fontPromises = fontList.map(fontName => {
       return document.fonts.load(`40px "${fontName}"`).catch(() => {
         console.warn(`Failed to load font: ${fontName}`);
       });
     });
 
-    fontsLoadingPromise = Promise.all(fontPromises).then(() => {
-      fontsLoaded = true;
-      console.log('✅ All fonts loaded successfully!');
-      return true;
-    }).catch(() => {
-      fontsLoaded = true;
-      console.warn('⚠️ Some fonts failed to load, continuing...');
-      return true;
-    });
+    fontsLoadingPromise = Promise.all(fontPromises)
+      .then(() => {
+        fontsLoaded = true;
+        console.log("✅ All fonts loaded successfully!");
+        return true;
+      })
+      .catch(() => {
+        fontsLoaded = true;
+        console.warn("⚠️ Some fonts failed to load, continuing...");
+        return true;
+      });
 
     return fontsLoadingPromise;
   } else {
-    fontsLoadingPromise = new Promise((resolve) => {
+    fontsLoadingPromise = new Promise(resolve => {
       setTimeout(() => {
         fontsLoaded = true;
-        console.log('✅ Font loading timeout completed');
+        console.log("✅ Font loading timeout completed");
         resolve(true);
       }, 2000);
     });
@@ -115,13 +141,13 @@ function updateFormatDescription() {
 }
 
 /* Add event listeners to radio buttons and start font loading */
-document.addEventListener('DOMContentLoaded', function() {
-  console.log('🔄 Starting font preload...');
+document.addEventListener("DOMContentLoaded", function () {
+  console.log("🔄 Starting font preload...");
   forceLoadAllFonts();
-  
+
   const formatRadios = document.querySelectorAll('input[name="output-format"]');
   formatRadios.forEach(radio => {
-    radio.addEventListener('change', updateFormatDescription);
+    radio.addEventListener("change", updateFormatDescription);
   });
   updateFormatDescription();
 });
@@ -132,7 +158,7 @@ const canvas = document.getElementById("template-canvas");
 const dragOverlay = document.getElementById("canvas-overlay");
 
 // Prevent default drag behaviors on the entire document
-['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+["dragenter", "dragover", "dragleave", "drop"].forEach(eventName => {
   document.addEventListener(eventName, preventDefaults, false);
 });
 
@@ -142,50 +168,50 @@ function preventDefaults(e) {
 }
 
 // Highlight drag area when file is dragged over
-['dragenter', 'dragover'].forEach(eventName => {
+["dragenter", "dragover"].forEach(eventName => {
   canvasContainer.addEventListener(eventName, highlight, false);
   canvas.addEventListener(eventName, highlight, false);
 });
 
-['dragleave', 'drop'].forEach(eventName => {
+["dragleave", "drop"].forEach(eventName => {
   canvasContainer.addEventListener(eventName, unhighlight, false);
   canvas.addEventListener(eventName, unhighlight, false);
 });
 
 function highlight(e) {
-  dragOverlay.classList.add('active');
-  canvas.classList.add('drag-hover');
+  dragOverlay.classList.add("active");
+  canvas.classList.add("drag-hover");
 }
 
 function unhighlight(e) {
-  dragOverlay.classList.remove('active');
-  canvas.classList.remove('drag-hover');
+  dragOverlay.classList.remove("active");
+  canvas.classList.remove("drag-hover");
 }
 
 // Handle dropped files
-canvasContainer.addEventListener('drop', handleDrop, false);
-canvas.addEventListener('drop', handleDrop, false);
+canvasContainer.addEventListener("drop", handleDrop, false);
+canvas.addEventListener("drop", handleDrop, false);
 
 function handleDrop(e) {
   const dt = e.dataTransfer;
   const files = dt.files;
-  
+
   if (files.length > 0) {
     const file = files[0];
-    
+
     // Validate file type
-    const validTypes = ['image/png', 'image/jpg', 'image/jpeg'];
+    const validTypes = ["image/png", "image/jpg", "image/jpeg"];
     if (!validTypes.includes(file.type)) {
-      alert('Please drop a valid image file (PNG, JPG, JPEG)');
+      alert("Please drop a valid image file (PNG, JPG, JPEG)");
       return;
     }
-    
+
     // Validate file size (max 10MB)
     if (file.size > 10 * 1024 * 1024) {
-      alert('File size too large. Please use files under 10MB.');
+      alert("File size too large. Please use files under 10MB.");
       return;
     }
-    
+
     // Process the dropped file (same as file input)
     processTemplateFile(file);
   }
@@ -193,29 +219,29 @@ function handleDrop(e) {
 
 function processTemplateFile(file) {
   const reader = new FileReader();
-  
-  reader.onload = (ev) => {
+
+  reader.onload = ev => {
     img.onload = () => {
       // ✅ SET CANVAS SIZE - This is the fix!
       cvs.width = 900;
       cvs.height = 550;
-      
+
       ctx.drawImage(img, 0, 0, 900, 550);
-      
+
       // Hide upload button and show instructions
       upIn.hidden = true;
-      
+
       // 📱 NEW: Auto-setup for mobile
       if (checkMobile()) {
         setupMobileMode();
       }
-      
+
       // Show success message
       showDropSuccess();
     };
     img.src = ev.target.result;
   };
-  
+
   reader.readAsDataURL(file);
   cvs.style.cursor = checkMobile() ? "grab" : "crosshair";
 }
@@ -223,33 +249,33 @@ function processTemplateFile(file) {
 // 📱 UPDATED: Mobile setup function with new default values
 function setupMobileMode() {
   // Auto-set text area for mobile with new default values
-  sx = 50;  // 30px from left (CHANGED FROM 50)
+  sx = 50; // 30px from left (CHANGED FROM 50)
   sy = mobileTextY - 30; // Text area top
   ex = 850; // 870px from left (CHANGED FROM 850, gives 840px width)
   ey = mobileTextY + 30; // Text area bottom (60px height)
-  
+
   // Skip normal dragging flow
   upIn.hidden = upBtn.hidden = true;
   dragLi.textContent = "Drag vertically to move, touch edges to resize horizontally";
   instr.style.display = "none";
-  
+
   // Show buttons immediately
   nextB.style.display = backB.style.display = "inline-block";
-  
+
   // Show preview
   preview();
 }
 
 function showDropSuccess() {
   // Create temporary success message
-  const successMsg = document.createElement('div');
+  const successMsg = document.createElement("div");
   successMsg.innerHTML = `
     <div style="position: absolute; top: 10px; right: 10px; background: #1ec1cb; color: white; padding: 8px 12px; border-radius: 5px; font-size: 12px; z-index: 100; box-shadow: 0 4px 15px rgba(30, 193, 203, 0.3);">
       ✅ Template uploaded successfully!
     </div>
   `;
   canvasContainer.appendChild(successMsg);
-  
+
   // Remove message after 3 seconds
   setTimeout(() => {
     if (successMsg.parentNode) {
@@ -260,7 +286,7 @@ function showDropSuccess() {
 
 /* choose template - Updated to use shared processing function */
 upBtn.onclick = () => upIn.click();
-upIn.onchange = (e) => {
+upIn.onchange = e => {
   const f = e.target.files[0];
   if (!f) return;
   processTemplateFile(f);
@@ -271,29 +297,29 @@ function detectEdgeTouch(touchX, canvasRect) {
   const canvasX = (touchX - canvasRect.left) * (900 / canvasRect.width);
   const leftEdge = sx;
   const rightEdge = ex;
-  
+
   // Check if touch is within edge zones
   if (Math.abs(canvasX - leftEdge) <= edgeTouchZone) {
-    return 'left';
+    return "left";
   } else if (Math.abs(canvasX - rightEdge) <= edgeTouchZone) {
-    return 'right';
+    return "right";
   }
   return null;
 }
 
 // 📱 UPDATED: Mobile touch events with horizontal cropping
-cvs.addEventListener('touchstart', (e) => {
+cvs.addEventListener("touchstart", e => {
   if (!checkMobile() || !img.src) return;
-  
+
   e.preventDefault();
   const touch = e.touches[0];
   const rect = cvs.getBoundingClientRect();
   lastTouchX = touch.clientX - rect.left;
   lastTouchY = touch.clientY - rect.top;
-  
+
   // Check if touching horizontal edges
   const edgeSide = detectEdgeTouch(touch.clientX, rect);
-  
+
   if (edgeSide) {
     // Horizontal edge dragging
     mobileHorizontalDrag = true;
@@ -306,57 +332,55 @@ cvs.addEventListener('touchstart', (e) => {
   }
 });
 
-cvs.addEventListener('touchmove', (e) => {
+cvs.addEventListener("touchmove", e => {
   if (!checkMobile() || (!mobileVerticalDrag && !mobileHorizontalDrag)) return;
-  
+
   e.preventDefault();
   const touch = e.touches[0];
   const rect = cvs.getBoundingClientRect();
   const currentTouchX = touch.clientX - rect.left;
   const currentTouchY = touch.clientY - rect.top;
-  
+
   if (mobileVerticalDrag) {
     // Vertical movement (existing logic)
     const deltaY = (currentTouchY - lastTouchY) * (550 / rect.height);
     mobileTextY = Math.max(50, Math.min(500, mobileTextY + deltaY));
-    
+
     // Update text area Y coordinates
     sy = mobileTextY - 30;
     ey = mobileTextY + 30;
-    
+
     lastTouchY = currentTouchY;
-    
   } else if (mobileHorizontalDrag) {
     // Horizontal resizing (NEW FUNCTIONALITY)
     const deltaX = (currentTouchX - lastTouchX) * (900 / rect.width);
-    
-    if (horizontalDragSide === 'left') {
+
+    if (horizontalDragSide === "left") {
       // Dragging left edge
       const newSx = sx + deltaX;
       const minSx = 25; // Minimum left position
       const maxSx = ex - 50; // Must maintain minimum 50px width
-      
+
       sx = Math.max(minSx, Math.min(maxSx, newSx));
-      
-    } else if (horizontalDragSide === 'right') {
+    } else if (horizontalDragSide === "right") {
       // Dragging right edge
       const newEx = ex + deltaX;
       const minEx = sx + 50; // Must maintain minimum 50px width
       const maxEx = 875; // Maximum right position
-      
+
       ex = Math.max(minEx, Math.min(maxEx, newEx));
     }
-    
+
     lastTouchX = currentTouchX;
   }
-  
+
   // Update preview
   preview();
 });
 
-cvs.addEventListener('touchend', (e) => {
+cvs.addEventListener("touchend", e => {
   if (!checkMobile()) return;
-  
+
   e.preventDefault();
   mobileVerticalDrag = false;
   mobileHorizontalDrag = false;
@@ -365,12 +389,12 @@ cvs.addEventListener('touchend', (e) => {
 });
 
 /* 🖥️ DESKTOP: Normal drag rectangle */
-cvs.onmousedown = (e) => {
+cvs.onmousedown = e => {
   if (!img.src) return;
-  
+
   // Skip desktop dragging on mobile
   if (checkMobile()) return;
-  
+
   drag = true;
   const r = cvs.getBoundingClientRect();
   sx = e.clientX - r.left;
@@ -384,7 +408,7 @@ cvs.onmousedown = (e) => {
   }
 };
 
-cvs.onmousemove = (e) => {
+cvs.onmousemove = e => {
   if (!drag || checkMobile()) return;
   const r = cvs.getBoundingClientRect();
   ex = e.clientX - r.left;
@@ -395,10 +419,10 @@ cvs.onmousemove = (e) => {
 cvs.onmouseup = async () => {
   if (!drag || checkMobile()) return;
   drag = false;
-  
+
   // WAIT for fonts before drawing preview
   await forceLoadAllFonts();
-  
+
   preview();
   if (!step2) {
     nextB.style.display = backB.style.display = "inline-block";
@@ -416,12 +440,12 @@ function drawRect() {
 // 📱 UPDATED: Enhanced preview function with better visual indicators
 async function preview() {
   if (!sx || !ex) return;
-  
+
   // CRITICAL: Wait for fonts to load before drawing
   if (!fontsLoaded) {
     await forceLoadAllFonts();
   }
-  
+
   if (!checkMobile()) {
     drawRect();
   } else {
@@ -429,40 +453,40 @@ async function preview() {
     ctx.clearRect(0, 0, 900, 550);
     ctx.drawImage(img, 0, 0, 900, 550);
   }
-  
+
   const cx = (sx + ex) / 2,
     cy = (sy + ey) / 2;
   const fam = fontSel.value;
-  
+
   // Set font with fallback
   ctx.font = `${sizeSel.value}px "${fam}", Arial, sans-serif`;
   ctx.fillStyle = colorIn.value;
   ctx.textAlign = "center";
   ctx.setLineDash([]);
   ctx.fillText("Your Name", cx, cy);
-  
+
   // 📱 ENHANCED: Mobile indicators with horizontal resize handles
   if (checkMobile()) {
     // Main rectangle
     ctx.strokeStyle = "#1ec1cb";
     ctx.setLineDash([4]);
     ctx.strokeRect(sx, sy, ex - sx, ey - sy);
-    
+
     // Vertical drag arrows (existing)
     ctx.fillStyle = "#1ec1cb";
     ctx.font = "20px Arial";
     ctx.fillText("▲", cx + 100, sy - 10);
     ctx.fillText("▼", cx + 100, ey + 25);
-    
+
     // NEW: Horizontal resize handles
     ctx.fillStyle = "#ff6b6b"; // Different color for horizontal handles
     ctx.font = "16px Arial";
-    
+
     // Left handle
     ctx.fillRect(sx - 3, sy, 6, ey - sy);
     ctx.fillStyle = "#1ec1cb";
     ctx.fillText("◀", sx - 15, cy + 5);
-    
+
     // Right handle
     ctx.fillStyle = "#ff6b6b";
     ctx.fillRect(ex - 3, sy, 6, ey - sy);
@@ -475,17 +499,15 @@ async function preview() {
 (function sortFontDropdown() {
   const select = document.getElementById("font-style");
   const opts = Array.from(select.options);
-  opts.sort((a, b) =>
-    a.text.toLowerCase().localeCompare(b.text.toLowerCase())
-  );
-  opts.forEach((o) => select.appendChild(o));
+  opts.sort((a, b) => a.text.toLowerCase().localeCompare(b.text.toLowerCase()));
+  opts.forEach(o => select.appendChild(o));
 })();
 
 /* nav */
 nextB.onclick = () => {
   dragLi.textContent = "Select the names File,Font and Download settings below";
   setDiv.style.display = "block";
-  downloadSettingsDiv.style.display = "block";  
+  downloadSettingsDiv.style.display = "block";
   nextB.style.display = "none";
   fileB.style.display = "inline-block";
   step2 = true;
@@ -503,7 +525,7 @@ backB.onclick = () => {
   dragLi.textContent = "Or Drag & Drop your certificate template here";
   dragLi.style.display = "block";
   dragLi.style.fontSize = "";
-  dragLi.style.paddingTop = ""; 
+  dragLi.style.paddingTop = "";
   upIn.hidden = upBtn.hidden = false;
   instr.style.display = "block";
   ctx.clearRect(0, 0, 900, 550);
@@ -511,7 +533,7 @@ backB.onclick = () => {
   upIn.value = "";
   namesIn.value = "";
   step2 = false;
-  
+
   // 📱 UPDATED: Reset mobile state with new defaults
   mobileTextY = 275;
   mobileVerticalDrag = false;
@@ -543,17 +565,17 @@ namesIn.onchange = async () => {
     alert("Upload a template first");
     return;
   }
-  
+
   const formatElement = document.querySelector('input[name="output-format"]:checked');
   if (!formatElement) {
     alert("Please select an output format");
     return;
   }
-  
+
   const format = formatElement.value;
   fileB.textContent = format === "pdf" ? "Generating PDF..." : "Generating PNGs...";
   fileB.disabled = true;
-  
+
   try {
     const fd = new FormData();
     fd.append("template", upIn.files[0]);
@@ -563,55 +585,55 @@ namesIn.onchange = async () => {
     fd.append("font_color", colorIn.value);
     fd.append("coords", [sx, sy, ex, ey].join(","));
     fd.append("output_format", format);
-    
+
     const res = await fetch("/generate", { method: "POST", body: fd });
     if (!res.ok) throw new Error(`Server ${res.status}`);
-    
+
     const blob = await res.blob();
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
-    
+
     if (format === "pdf") {
       a.download = "Certificates.pdf";
     } else {
       a.download = "Certificates.zip";
     }
-    
+
     a.click();
     namesIn.value = "";
   } catch (err) {
     alert("Error: " + err.message);
   }
-  
+
   fileB.textContent = format === "pdf" ? "Generate PDF" : "Generate PNGs";
   fileB.disabled = false;
 };
 
 /* ===== COMBINED MODAL & MOBILE MENU SYSTEM ===== */
-document.addEventListener('DOMContentLoaded', function() {
-    // MODAL ELEMENTS
-    const modalOverlay = document.getElementById('modal-overlay');
-    const modalContent = document.getElementById('modal-content');
-    const modalBody = document.getElementById('modal-body');
-    const modalClose = document.getElementById('modal-close');
-    
-    const aboutBtn = document.getElementById('about-btn');
-    const creatorsBtn = document.getElementById('creators-btn');
-    const projectsBtn = document.getElementById('projects-btn');
-    const contactBtn = document.getElementById('contact-btn');
+document.addEventListener("DOMContentLoaded", function () {
+  // MODAL ELEMENTS
+  const modalOverlay = document.getElementById("modal-overlay");
+  const modalContent = document.getElementById("modal-content");
+  const modalBody = document.getElementById("modal-body");
+  const modalClose = document.getElementById("modal-close");
 
-    // MOBILE MENU ELEMENTS
-    const hamburgerBtn = document.getElementById('hamburger-btn');
-    const mobileMenu = document.getElementById('mobile-menu');
-    const mobileCloseBtn = document.getElementById('mobile-close-btn');
-    const mobileAbout = document.getElementById('mobile-about');
-    const mobileCreators = document.getElementById('mobile-creators');
-    const mobileProjects = document.getElementById('mobile-projects');
-    const mobileContact = document.getElementById('mobile-contact');
+  const aboutBtn = document.getElementById("about-btn");
+  const creatorsBtn = document.getElementById("creators-btn");
+  const projectsBtn = document.getElementById("projects-btn");
+  const contactBtn = document.getElementById("contact-btn");
 
-    // MODAL CONTENT TEMPLATES
-    const modalContents = {
-        about: `
+  // MOBILE MENU ELEMENTS
+  const hamburgerBtn = document.getElementById("hamburger-btn");
+  const mobileMenu = document.getElementById("mobile-menu");
+  const mobileCloseBtn = document.getElementById("mobile-close-btn");
+  const mobileAbout = document.getElementById("mobile-about");
+  const mobileCreators = document.getElementById("mobile-creators");
+  const mobileProjects = document.getElementById("mobile-projects");
+  const mobileContact = document.getElementById("mobile-contact");
+
+  // MODAL CONTENT TEMPLATES
+  const modalContents = {
+    about: `
             <h2>About CertiHub</h2>
             <p>🎓 <strong>CertiHub</strong> is a powerful, easy-to-use certificate generator that helps you create professional certificates in minutes!</p>
             
@@ -629,19 +651,23 @@ document.addEventListener('DOMContentLoaded', function() {
             
             <p><strong>Version:</strong> 2.0 | <strong>Last Updated:</strong> October 2025</p>
         `,
-        
-        creators: `
+
+    creators: `
             <h2>Meet the Creators</h2>
             <p>CertiHub is proudly created by a passionate team of developers:</p>
             
             <div class="creator-card">
                 <div class="name">🚀 Development Team</div>
+                <div class="name">Mr Mueez Hajwani</div>
+                <div class="name">Mr Talha Siddique</div>
                 <div class="role">Full-Stack Developers</div>
                 <div class="bio">Passionate developers focused on creating useful tools that make certificate generation simple and efficient.</div>
             </div>
             
             <div class="creator-card">
                 <div class="name">🎨 Design Team</div>
+                <div class="name">Mr Mueez Hajwani</div>
+                <div class="name">Mr Saeem Bijle</div>
                 <div class="role">UI/UX Designers</div>
                 <div class="bio">Crafting beautiful, intuitive interfaces that make complex tasks feel effortless.</div>
             </div>
@@ -649,168 +675,163 @@ document.addEventListener('DOMContentLoaded', function() {
             <p>💝 Built with love using Flask, JavaScript, and modern web technologies.</p>
             <p>🌟 Thank you for using CertiHub and supporting our work!</p>
         `,
-        
-        projects: `
+
+    projects: `
             <h2>Other Projects</h2>
             <p>🚀 Explore more useful tools and projects:</p>
             
             <ul class="feature-list">
                 <li><strong>QR Generator Pro</strong> - Advanced QR code generator</li>
-                <li><strong>Image Optimizer</strong> - Compress and optimize images</li>
-                <li><strong>Text Utils</strong> - Collection of text processing tools</li>
-                <li><strong>Color Palette Generator</strong> - Create beautiful color schemes</li>
-                <li><strong>Invoice Generator</strong> - Professional invoice creator</li>
-                <li><strong>Resume Builder</strong> - Modern resume templates</li>
             </ul>
             
             <p>🌐 More projects coming soon! Stay tuned for updates.</p>
             <p>💡 Have an idea for a useful tool? Let us know!</p>
         `,
-        
-        contact: `
+
+    contact: `
             <h2>Get in Touch</h2>
             <p>📬 We'd love to hear from you! Reach out for support, feedback, or collaboration:</p>
             
             <div class="creator-card">
                 <div class="name">📧 Email Support</div>
                 <div class="role">General Inquiries</div>
-                <div class="bio">support@certihub.com<br>We typically respond within 24 hours</div>
+                <div class="bio">23ds33@aiktc.ac.in<br>We typically respond within 24 hours</div>
             </div>
             
             <div class="creator-card">
                 <div class="name">🐛 Bug Reports</div>
                 <div class="role">Technical Issues</div>
-                <div class="bio">bugs@certihub.com<br>Help us improve CertiHub</div>
+                <div class="bio">23ds33@aiktc.ac.in<br>Help us improve CertiHub</div>
             </div>
             
             <div class="creator-card">
                 <div class="name">💡 Feature Requests</div>
                 <div class="role">Suggestions & Ideas</div>
-                <div class="bio">features@certihub.com<br>Share your ideas with us</div>
+                <div class="bio">23ds26@aiktc.ac.in<br>Share your ideas with us</div>
             </div>
             
             <p>🌟 <strong>Love CertiHub?</strong> Share it with your friends and colleagues!</p>
-        `
-    };
+        `,
+  };
 
-    // MODAL FUNCTIONS
-    function openModal(content) {
-        if (modalBody && modalOverlay) {
-            modalBody.innerHTML = modalContents[content];
-            modalOverlay.classList.add('active');
-            document.body.style.overflow = 'hidden';
-        }
+  // MODAL FUNCTIONS
+  function openModal(content) {
+    if (modalBody && modalOverlay) {
+      modalBody.innerHTML = modalContents[content];
+      modalOverlay.classList.add("active");
+      document.body.style.overflow = "hidden";
     }
+  }
 
-    function closeModal() {
-        if (modalOverlay) {
-            modalOverlay.classList.remove('active');
-            document.body.style.overflow = 'auto';
-        }
-    }
-
-    // MOBILE MENU FUNCTIONS
-    function closeMenu() {
-        if (hamburgerBtn && mobileMenu) {
-            hamburgerBtn.classList.remove('active');
-            mobileMenu.classList.remove('active');
-            document.body.style.overflow = 'auto';
-        }
-    }
-
-    function openMenu() {
-        if (hamburgerBtn && mobileMenu) {
-            hamburgerBtn.classList.add('active');
-            mobileMenu.classList.add('active');
-            document.body.style.overflow = 'hidden';
-        }
-    }
-
-    // CORNER BUTTON EVENT LISTENERS (Desktop)
-    if (aboutBtn) aboutBtn.addEventListener('click', () => openModal('about'));
-    if (creatorsBtn) creatorsBtn.addEventListener('click', () => openModal('creators'));
-    if (projectsBtn) projectsBtn.addEventListener('click', () => openModal('projects'));
-    if (contactBtn) contactBtn.addEventListener('click', () => openModal('contact'));
-
-    // MODAL CLOSE EVENT LISTENERS
-    if (modalClose) modalClose.addEventListener('click', closeModal);
+  function closeModal() {
     if (modalOverlay) {
-        modalOverlay.addEventListener('click', (e) => {
-            if (e.target === modalOverlay) {
-                closeModal();
-            }
-        });
+      modalOverlay.classList.remove("active");
+      document.body.style.overflow = "auto";
     }
+  }
 
-    // HAMBURGER MENU EVENT LISTENERS
-    if (hamburgerBtn) {
-        hamburgerBtn.addEventListener('click', function(e) {
-            e.stopPropagation();
-            
-            if (mobileMenu.classList.contains('active')) {
-                closeMenu();
-            } else {
-                openMenu();
-            }
-        });
+  // MOBILE MENU FUNCTIONS
+  function closeMenu() {
+    if (hamburgerBtn && mobileMenu) {
+      hamburgerBtn.classList.remove("active");
+      mobileMenu.classList.remove("active");
+      document.body.style.overflow = "auto";
     }
+  }
 
-    // MOBILE CLOSE BUTTON
-    if (mobileCloseBtn) {
-        mobileCloseBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            closeMenu();
-        });
+  function openMenu() {
+    if (hamburgerBtn && mobileMenu) {
+      hamburgerBtn.classList.add("active");
+      mobileMenu.classList.add("active");
+      document.body.style.overflow = "hidden";
     }
+  }
 
-    // MOBILE MENU BACKGROUND CLOSE
-    if (mobileMenu) {
-        mobileMenu.addEventListener('click', function(e) {
-            if (e.target === mobileMenu) {
-                closeMenu();
-            }
-        });
-    }
+  // CORNER BUTTON EVENT LISTENERS (Desktop)
+  if (aboutBtn) aboutBtn.addEventListener("click", () => openModal("about"));
+  if (creatorsBtn) creatorsBtn.addEventListener("click", () => openModal("creators"));
+  if (projectsBtn) projectsBtn.addEventListener("click", () => openModal("projects"));
+  if (contactBtn) contactBtn.addEventListener("click", () => openModal("contact"));
 
-    // MOBILE MENU ITEMS - NOW THEY CAN ACCESS openModal!
-    if (mobileAbout) {
-        mobileAbout.addEventListener('click', () => {
-            openModal('about');
-            closeMenu();
-        });
-    }
-
-    if (mobileCreators) {
-        mobileCreators.addEventListener('click', () => {
-            openModal('creators');
-            closeMenu();
-        });
-    }
-
-    if (mobileProjects) {
-        mobileProjects.addEventListener('click', () => {
-            openModal('projects');
-            closeMenu();
-        });
-    }
-
-    if (mobileContact) {
-        mobileContact.addEventListener('click', () => {
-            openModal('contact');
-            closeMenu();
-        });
-    }
-
-    // GLOBAL EVENT LISTENERS
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') {
-            if (modalOverlay && modalOverlay.classList.contains('active')) {
-                closeModal();
-            }
-            if (mobileMenu && mobileMenu.classList.contains('active')) {
-                closeMenu();
-            }
-        }
+  // MODAL CLOSE EVENT LISTENERS
+  if (modalClose) modalClose.addEventListener("click", closeModal);
+  if (modalOverlay) {
+    modalOverlay.addEventListener("click", e => {
+      if (e.target === modalOverlay) {
+        closeModal();
+      }
     });
+  }
+
+  // HAMBURGER MENU EVENT LISTENERS
+  if (hamburgerBtn) {
+    hamburgerBtn.addEventListener("click", function (e) {
+      e.stopPropagation();
+
+      if (mobileMenu.classList.contains("active")) {
+        closeMenu();
+      } else {
+        openMenu();
+      }
+    });
+  }
+
+  // MOBILE CLOSE BUTTON
+  if (mobileCloseBtn) {
+    mobileCloseBtn.addEventListener("click", function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      closeMenu();
+    });
+  }
+
+  // MOBILE MENU BACKGROUND CLOSE
+  if (mobileMenu) {
+    mobileMenu.addEventListener("click", function (e) {
+      if (e.target === mobileMenu) {
+        closeMenu();
+      }
+    });
+  }
+
+  // MOBILE MENU ITEMS - NOW THEY CAN ACCESS openModal!
+  if (mobileAbout) {
+    mobileAbout.addEventListener("click", () => {
+      openModal("about");
+      closeMenu();
+    });
+  }
+
+  if (mobileCreators) {
+    mobileCreators.addEventListener("click", () => {
+      openModal("creators");
+      closeMenu();
+    });
+  }
+
+  if (mobileProjects) {
+    mobileProjects.addEventListener("click", () => {
+      openModal("projects");
+      closeMenu();
+    });
+  }
+
+  if (mobileContact) {
+    mobileContact.addEventListener("click", () => {
+      openModal("contact");
+      closeMenu();
+    });
+  }
+
+  // GLOBAL EVENT LISTENERS
+  document.addEventListener("keydown", e => {
+    if (e.key === "Escape") {
+      if (modalOverlay && modalOverlay.classList.contains("active")) {
+        closeModal();
+      }
+      if (mobileMenu && mobileMenu.classList.contains("active")) {
+        closeMenu();
+      }
+    }
+  });
 });
