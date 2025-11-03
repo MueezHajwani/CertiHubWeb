@@ -54,14 +54,17 @@ function forceLoadAllFonts() {
   }
 
   const fontList = [
+    "Alex Brush", // ✅ ADD THIS
+    "Allura", // ✅ ADD THIS
     "Anton",
     "Arimo",
-    "Orbitron",
     "Ballet",
     "Bebas Neue",
+    "Bree Serif", // ✅ ADD THIS
     "Cabin",
     "DM Sans",
     "Fira Sans",
+    "Great Vibes", // ✅ ADD THIS
     "Heebo",
     "Inter",
     "Josefin Sans",
@@ -74,13 +77,16 @@ function forceLoadAllFonts() {
     "Noto Sans",
     "Nunito",
     "Open Sans",
+    "Orbitron",
     "Oswald",
+    "Pacifico", // ✅ ADD THIS
     "Playfair Display",
     "Poppins",
     "PT Sans",
     "Raleway",
-    "Roboto Slab",
+    "Righteous",
     "Roboto",
+    "Roboto Slab",
     "Ubuntu",
     "Work Sans",
   ];
