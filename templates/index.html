@@ -144,46 +144,49 @@
         <input type="color" id="font-color" value="#000000" />
       </div>
 
-      <div id="download-settings">
-        <h3>Download Settings</h3>
-        <div class="radio-group">
-          <label class="radio-option">
-            <input type="radio" name="output-format" value="pdf" checked />
-            <span class="radio-custom"></span>
-            <span class="radio-text">PDF (Single File)</span>
-          </label>
+      <div id="right-sidebar">
+        
+        <div id="download-settings">
+          <h3>Download Settings</h3>
+          <div class="radio-group">
+            <label class="radio-option">
+              <input type="radio" name="output-format" value="pdf" checked />
+              <span class="radio-custom"></span>
+              <span class="radio-text">PDF (Single File)</span>
+            </label>
 
-          <label class="radio-option">
-            <input type="radio" name="output-format" value="png" />
-            <span class="radio-custom"></span>
-            <span class="radio-text">PNG Images (ZIP)</span>
-          </label>
+            <label class="radio-option">
+              <input type="radio" name="output-format" value="png" />
+              <span class="radio-custom"></span>
+              <span class="radio-text">PNG Images (ZIP)</span>
+            </label>
 
-          <label class="radio-option">
-            <input type="radio" name="output-format" value="void" />
-            <span class="radio-custom"></span>
-            <span class="radio-text">Void (Blank Templates)</span>
-          </label>
+            <label class="radio-option">
+              <input type="radio" name="output-format" value="void" />
+              <span class="radio-custom"></span>
+              <span class="radio-text">Void (Blank Templates)</span>
+            </label>
+          </div>
+
+          <div id="void-quantity-container">
+            <label for="void-quantity">Quantity:</label>
+            <input type="number" id="void-quantity" min="1" max="1000" value="5" />
+          </div>
+
+          <div id="format-info">
+            <small id="format-description">Single PDF with all certificates</small>
+          </div>
         </div>
 
-        <div id="void-quantity-container">
-          <label for="void-quantity">Quantity:</label>
-          <input type="number" id="void-quantity" min="1" max="1000" value="5" />
-        </div>
-
-        <div id="format-info">
-          <small id="format-description">Single PDF with all certificates</small>
-        </div>
-      </div>
-
-      <div id="history-panel">
-        <h3>Session History</h3>
-        <ul id="history-list">
+        <div id="history-panel">
+          <h3>Session History</h3>
+          <ul id="history-list">
           </ul>
-        <button id="merge-pdf-btn">Merge All PDFs</button>
-      </div>
+          <button id="merge-pdf-btn">Merge All PDFs</button>
+        </div>
 
-    </div>
+      </div>
+      </div>
 
     <div id="instruction-label">
       Please upload a template and drag to select where names will be printed.
