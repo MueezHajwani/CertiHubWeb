@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -7,17 +7,14 @@
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
     />
     <title>CertiHub</title>
-    <!-- Google Fonts Integration -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Allura&family=Anton&family=Arimo:wght@400;700&family=Ballet&family=Bebas+Neue&family=Bree+Serif&family=Cabin:wght@400;700&family=DM+Sans:wght@400;700&family=Fira+Sans:wght@400;700&family=Great+Vibes&family=Heebo:wght@400;700&family=Inter:wght@400;700&family=Josefin+Sans:wght@400;700&family=Karla:wght@400;700&family=Lato:wght@400;700&family=Libre+Baskerville:wght@400;700&family=Merriweather:wght@400;700&family=Montserrat:wght@400;700&family=Mukta:wght@400;700&family=Noto+Sans:wght@400;700&family=Nunito:wght@400;700&family=Open+Sans:wght@400;700&family=Orbitron:wght@400;700;900&family=Oswald:wght@400;700&family=Pacifico&family=Playfair+Display:wght@400;700&family=Poppins:wght@400;600;700&family=PT+Sans:wght@400;700&family=Raleway:wght@400;700&family=Righteous&family=Roboto:wght@400;700&family=Roboto+Slab:wght@400;700&family=Ubuntu:wght@400;700&family=Work+Sans:wght@400;700&display=block"
       rel="stylesheet"
     />
-    <!-- If you rename to CertihubLogo.png -->
     <link rel="icon" type="image/png" href="/static/images/certihub-logo.png" />
 
-    <!-- Link to external CSS file -->
     <link rel="stylesheet" href="/static/style.css" />
     <link rel="stylesheet" href="/static/responsive.css" />
     <link
@@ -26,10 +23,7 @@
     />
   </head>
   <body>
-    <!-- Your HTML continues here -->
-    <!-- Corner Navigation Buttons -->
     <div class="corner-nav-buttons">
-      <!-- Left Side -->
       <div class="corner-button left-top" id="about-btn">
         <i class="fas fa-info"></i>
         <span>About</span>
@@ -39,7 +33,6 @@
         <span>Creator</span>
       </div>
 
-      <!-- Right Side -->
       <div class="corner-button right-top" id="projects-btn">
         <i class="fas fa-rocket"></i>
         <span>Projects</span>
@@ -49,7 +42,6 @@
         <span>Contact</span>
       </div>
     </div>
-    <!-- Mobile Hamburger Menu (768px and below) -->
     <div class="mobile-nav">
       <button class="hamburger-btn" id="hamburger-btn">
         <span></span>
@@ -58,12 +50,10 @@
       </button>
 
       <div class="mobile-menu" id="mobile-menu">
-        <!-- CLOSE BUTTON -->
         <button class="mobile-close-btn" id="mobile-close-btn">
           <i class="fas fa-times"></i>
         </button>
 
-        <!-- MENU ITEMS -->
         <div class="mobile-menu-item" id="mobile-about">
           <i class="fas fa-info-circle"></i>
           <span>About</span>
@@ -83,13 +73,10 @@
       </div>
     </div>
 
-    <!-- Modal Overlay -->
     <div class="modal-overlay" id="modal-overlay">
       <div class="modal-content" id="modal-content">
         <div class="modal-close" id="modal-close">&times;</div>
-        <div class="modal-body" id="modal-body">
-          <!-- Content will be inserted here -->
-        </div>
+        <div class="modal-body" id="modal-body"></div>
       </div>
     </div>
 
@@ -110,26 +97,21 @@
         </div>
       </div>
 
-      <!-- Font Settings Panel (Left) -->
       <div id="settings">
         <h3>Font Settings</h3>
         <label>Font Style:</label>
         <select id="font-style">
           <option value="Alex Brush">Alex Brush</option>
-          <!-- NEW -->
           <option value="Allura">Allura</option>
-          <!-- NEW -->
           <option value="Anton" selected>Anton (Default)</option>
           <option value="Arimo">Arimo</option>
           <option value="Ballet">Ballet</option>
           <option value="Bebas Neue">Bebas Neue</option>
           <option value="Bree Serif">Bree Serif</option>
-          <!-- NEW -->
           <option value="Cabin">Cabin</option>
           <option value="DM Sans">DM Sans</option>
           <option value="Fira Sans">Fira Sans</option>
           <option value="Great Vibes">Great Vibes</option>
-          <!-- NEW -->
           <option value="Heebo">Heebo</option>
           <option value="Inter">Inter</option>
           <option value="Josefin Sans">Josefin Sans</option>
@@ -145,7 +127,6 @@
           <option value="Orbitron">Orbitron</option>
           <option value="Oswald">Oswald</option>
           <option value="Pacifico">Pacifico</option>
-          <!-- NEW -->
           <option value="Playfair Display">Playfair Display</option>
           <option value="Poppins">Poppins</option>
           <option value="PT Sans">PT Sans</option>
@@ -163,7 +144,6 @@
         <input type="color" id="font-color" value="#000000" />
       </div>
 
-      <!-- Download Settings Panel (Right) -->
       <div id="download-settings">
         <h3>Download Settings</h3>
         <div class="radio-group">
@@ -178,6 +158,17 @@
             <span class="radio-custom"></span>
             <span class="radio-text">PNG Images (ZIP)</span>
           </label>
+
+          <label class="radio-option">
+            <input type="radio" name="output-format" value="void" />
+            <span class="radio-custom"></span>
+            <span class="radio-text">Void (Blank Templates)</span>
+          </label>
+        </div>
+
+        <div id="void-quantity-container">
+          <label for="void-quantity">Quantity:</label>
+          <input type="number" id="void-quantity" min="1" max="1000" value="5" />
         </div>
 
         <div id="format-info">
@@ -195,7 +186,6 @@
       <input id="names-file" type="file" accept=".txt,.pdf,.xlsx" hidden />
       <button id="back-btn">Back</button>
     </div>
-    <!-- Link to external JavaScript file -->
     <script src="/static/script.js"></script>
   </body>
 </html>

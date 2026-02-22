@@ -14,6 +14,7 @@ const colorIn = document.getElementById("font-color");
 const fileB = document.getElementById("file-upload-btn");
 const namesIn = document.getElementById("names-file");
 const formatDesc = document.getElementById("format-description");
+const voidContainer = document.getElementById("void-quantity-container"); // NEW
 
 let img = new Image(),
   drag = false,
@@ -23,48 +24,42 @@ let img = new Image(),
   ex,
   ey;
 
-// 📱 UPDATED: Mobile-specific variables with horizontal cropping
+// 📱 Mobile-specific variables
 let isMobile = false;
-let mobileTextY = 275; // Default center Y position for mobile
+let mobileTextY = 275;
 let mobileVerticalDrag = false;
 let mobileHorizontalDrag = false;
-let horizontalDragSide = null; // 'left' or 'right'
+let horizontalDragSide = null;
 let lastTouchX = 0;
 let lastTouchY = 0;
-let edgeTouchZone = 30; // 30px touch zone for edges
+let edgeTouchZone = 30;
 
-// Font loading tracker
 let fontsLoaded = false;
 let fontsLoadingPromise = null;
 
-// 📱 UPDATED: Check if device is mobile (768px and below)
 function checkMobile() {
   isMobile = window.innerWidth <= 768;
   return isMobile;
 }
 
-// 📱 Initialize mobile check
 checkMobile();
 window.addEventListener("resize", checkMobile);
 
-// Force load all fonts on page load
 function forceLoadAllFonts() {
-  if (fontsLoadingPromise) {
-    return fontsLoadingPromise;
-  }
+  if (fontsLoadingPromise) return fontsLoadingPromise;
 
   const fontList = [
-    "Alex Brush", // ✅ ADD THIS
-    "Allura", // ✅ ADD THIS
+    "Alex Brush",
+    "Allura",
     "Anton",
     "Arimo",
     "Ballet",
     "Bebas Neue",
-    "Bree Serif", // ✅ ADD THIS
+    "Bree Serif",
     "Cabin",
     "DM Sans",
     "Fira Sans",
-    "Great Vibes", // ✅ ADD THIS
+    "Great Vibes",
     "Heebo",
     "Inter",
     "Josefin Sans",
@@ -79,7 +74,7 @@ function forceLoadAllFonts() {
     "Open Sans",
     "Orbitron",
     "Oswald",
-    "Pacifico", // ✅ ADD THIS
+    "Pacifico",
     "Playfair Display",
     "Poppins",
     "PT Sans",
@@ -92,30 +87,24 @@ function forceLoadAllFonts() {
   ];
 
   if ("fonts" in document) {
-    const fontPromises = fontList.map(fontName => {
-      return document.fonts.load(`40px "${fontName}"`).catch(() => {
-        console.warn(`Failed to load font: ${fontName}`);
-      });
-    });
+    const fontPromises = fontList.map(fontName =>
+      document.fonts.load(`40px "${fontName}"`).catch(() => console.warn(`Failed: ${fontName}`))
+    );
 
     fontsLoadingPromise = Promise.all(fontPromises)
       .then(() => {
         fontsLoaded = true;
-        console.log("✅ All fonts loaded successfully!");
         return true;
       })
       .catch(() => {
         fontsLoaded = true;
-        console.warn("⚠️ Some fonts failed to load, continuing...");
         return true;
       });
-
     return fontsLoadingPromise;
   } else {
     fontsLoadingPromise = new Promise(resolve => {
       setTimeout(() => {
         fontsLoaded = true;
-        console.log("✅ Font loading timeout completed");
         resolve(true);
       }, 2000);
     });
@@ -132,27 +121,29 @@ for (let i = 1; i <= 120; i++) {
   sizeSel.appendChild(o);
 }
 
-/* Update format description when radio button changes */
+/* UPDATED: Handle Void UI changes */
 function updateFormatDescription() {
   const selectedFormat = document.querySelector('input[name="output-format"]:checked');
-  if (selectedFormat) {
-    if (selectedFormat.value === "pdf") {
-      formatDesc.textContent = "Single PDF with all certificates";
-      if (fileB) fileB.textContent = "Generate PDF";
-    } else {
-      formatDesc.textContent = "Individual PNG files in ZIP archive";
-      if (fileB) fileB.textContent = "Generate PNGs";
-    }
+  if (!selectedFormat) return;
+
+  if (selectedFormat.value === "pdf") {
+    formatDesc.textContent = "Single PDF with all certificates";
+    if (fileB) fileB.textContent = "Upload Names & Generate";
+    if (voidContainer) voidContainer.style.display = "none";
+  } else if (selectedFormat.value === "png") {
+    formatDesc.textContent = "Individual PNG files in ZIP archive";
+    if (fileB) fileB.textContent = "Upload Names & Generate";
+    if (voidContainer) voidContainer.style.display = "none";
+  } else if (selectedFormat.value === "void") {
+    formatDesc.textContent = "Multiple blank certificates in a single PDF";
+    if (fileB) fileB.textContent = "Generate Blank Templates";
+    if (voidContainer) voidContainer.style.display = "block"; // Show quantity input
   }
 }
 
-/* Add event listeners to radio buttons and start font loading */
 document.addEventListener("DOMContentLoaded", function () {
-  console.log("🔄 Starting font preload...");
   forceLoadAllFonts();
-
-  const formatRadios = document.querySelectorAll('input[name="output-format"]');
-  formatRadios.forEach(radio => {
+  document.querySelectorAll('input[name="output-format"]').forEach(radio => {
     radio.addEventListener("change", updateFormatDescription);
   });
   updateFormatDescription();
@@ -163,176 +154,122 @@ const canvasContainer = document.getElementById("canvas-container");
 const canvas = document.getElementById("template-canvas");
 const dragOverlay = document.getElementById("canvas-overlay");
 
-// Prevent default drag behaviors on the entire document
-["dragenter", "dragover", "dragleave", "drop"].forEach(eventName => {
-  document.addEventListener(eventName, preventDefaults, false);
+["dragenter", "dragover", "dragleave", "drop"].forEach(eName => {
+  document.addEventListener(
+    eName,
+    e => {
+      e.preventDefault();
+      e.stopPropagation();
+    },
+    false
+  );
 });
 
-function preventDefaults(e) {
-  e.preventDefault();
-  e.stopPropagation();
-}
-
-// Highlight drag area when file is dragged over
-["dragenter", "dragover"].forEach(eventName => {
-  canvasContainer.addEventListener(eventName, highlight, false);
-  canvas.addEventListener(eventName, highlight, false);
+["dragenter", "dragover"].forEach(eName => {
+  canvasContainer.addEventListener(
+    eName,
+    () => {
+      dragOverlay.classList.add("active");
+      canvas.classList.add("drag-hover");
+    },
+    false
+  );
 });
 
-["dragleave", "drop"].forEach(eventName => {
-  canvasContainer.addEventListener(eventName, unhighlight, false);
-  canvas.addEventListener(eventName, unhighlight, false);
+["dragleave", "drop"].forEach(eName => {
+  canvasContainer.addEventListener(
+    eName,
+    () => {
+      dragOverlay.classList.remove("active");
+      canvas.classList.remove("drag-hover");
+    },
+    false
+  );
 });
 
-function highlight(e) {
-  dragOverlay.classList.add("active");
-  canvas.classList.add("drag-hover");
-}
-
-function unhighlight(e) {
-  dragOverlay.classList.remove("active");
-  canvas.classList.remove("drag-hover");
-}
-
-// Handle dropped files
 canvasContainer.addEventListener("drop", handleDrop, false);
 canvas.addEventListener("drop", handleDrop, false);
 
 function handleDrop(e) {
-  const dt = e.dataTransfer;
-  const files = dt.files;
-
-  if (files.length > 0) {
-    const file = files[0];
-
-    // Validate file type
-    const validTypes = ["image/png", "image/jpg", "image/jpeg"];
-    if (!validTypes.includes(file.type)) {
-      alert("Please drop a valid image file (PNG, JPG, JPEG)");
-      return;
-    }
-
-    // Validate file size (max 10MB)
-    if (file.size > 10 * 1024 * 1024) {
-      alert("File size too large. Please use files under 10MB.");
-      return;
-    }
-
-    // Process the dropped file (same as file input)
-    processTemplateFile(file);
+  const file = e.dataTransfer.files[0];
+  if (!file || !["image/png", "image/jpg", "image/jpeg"].includes(file.type)) {
+    alert("Please drop a valid image file (PNG, JPG, JPEG)");
+    return;
   }
+  if (file.size > 10 * 1024 * 1024) {
+    alert("File size too large. Please use files under 10MB.");
+    return;
+  }
+  processTemplateFile(file);
 }
 
 function processTemplateFile(file) {
   const reader = new FileReader();
-
   reader.onload = ev => {
     img.onload = () => {
-      // ✅ SET CANVAS SIZE - This is the fix!
       cvs.width = 900;
       cvs.height = 550;
-
       ctx.drawImage(img, 0, 0, 900, 550);
-
-      // Hide upload button and show instructions
       upIn.hidden = true;
-
-      // 📱 NEW: Auto-setup for mobile
-      if (checkMobile()) {
-        setupMobileMode();
-      }
-
-      // Show success message
+      if (checkMobile()) setupMobileMode();
       showDropSuccess();
     };
     img.src = ev.target.result;
   };
-
   reader.readAsDataURL(file);
   cvs.style.cursor = checkMobile() ? "grab" : "crosshair";
 }
 
-// 📱 UPDATED: Mobile setup function with new default values
 function setupMobileMode() {
-  // Auto-set text area for mobile with new default values
-  sx = 50; // 30px from left (CHANGED FROM 50)
-  sy = mobileTextY - 30; // Text area top
-  ex = 850; // 870px from left (CHANGED FROM 850, gives 840px width)
-  ey = mobileTextY + 30; // Text area bottom (60px height)
-
-  // Skip normal dragging flow
+  sx = 50;
+  sy = mobileTextY - 30;
+  ex = 850;
+  ey = mobileTextY + 30;
   upIn.hidden = upBtn.hidden = true;
   dragLi.textContent = "Drag vertically to move, touch edges to resize horizontally";
   instr.style.display = "none";
-
-  // Show buttons immediately
   nextB.style.display = backB.style.display = "inline-block";
-
-  // Show preview
   preview();
 }
 
 function showDropSuccess() {
-  // Create temporary success message
   const successMsg = document.createElement("div");
   successMsg.innerHTML = `
-    <div style="position: absolute; top: 10px; right: 10px; background: #1ec1cb; color: white; padding: 8px 12px; border-radius: 5px; font-size: 12px; z-index: 100; box-shadow: 0 4px 15px rgba(30, 193, 203, 0.3);">
+    <div style="position: absolute; top: 10px; right: 10px; background: #1ec1cb; color: white; padding: 8px 12px; border-radius: 5px; font-size: 12px; z-index: 100;">
       ✅ Template uploaded successfully!
-    </div>
-  `;
+    </div>`;
   canvasContainer.appendChild(successMsg);
-
-  // Remove message after 3 seconds
   setTimeout(() => {
-    if (successMsg.parentNode) {
-      successMsg.parentNode.removeChild(successMsg);
-    }
+    if (successMsg.parentNode) successMsg.parentNode.removeChild(successMsg);
   }, 3000);
 }
 
-/* choose template - Updated to use shared processing function */
 upBtn.onclick = () => upIn.click();
 upIn.onchange = e => {
-  const f = e.target.files[0];
-  if (!f) return;
-  processTemplateFile(f);
+  if (e.target.files[0]) processTemplateFile(e.target.files[0]);
 };
 
-// 📱 NEW: Function to detect if touch is near horizontal edges
 function detectEdgeTouch(touchX, canvasRect) {
   const canvasX = (touchX - canvasRect.left) * (900 / canvasRect.width);
-  const leftEdge = sx;
-  const rightEdge = ex;
-
-  // Check if touch is within edge zones
-  if (Math.abs(canvasX - leftEdge) <= edgeTouchZone) {
-    return "left";
-  } else if (Math.abs(canvasX - rightEdge) <= edgeTouchZone) {
-    return "right";
-  }
+  if (Math.abs(canvasX - sx) <= edgeTouchZone) return "left";
+  if (Math.abs(canvasX - ex) <= edgeTouchZone) return "right";
   return null;
 }
 
-// 📱 UPDATED: Mobile touch events with horizontal cropping
 cvs.addEventListener("touchstart", e => {
   if (!checkMobile() || !img.src) return;
-
   e.preventDefault();
   const touch = e.touches[0];
   const rect = cvs.getBoundingClientRect();
   lastTouchX = touch.clientX - rect.left;
   lastTouchY = touch.clientY - rect.top;
 
-  // Check if touching horizontal edges
   const edgeSide = detectEdgeTouch(touch.clientX, rect);
-
   if (edgeSide) {
-    // Horizontal edge dragging
     mobileHorizontalDrag = true;
     horizontalDragSide = edgeSide;
     cvs.style.cursor = "ew-resize";
   } else {
-    // Vertical dragging (center area)
     mobileVerticalDrag = true;
     cvs.style.cursor = "ns-resize";
   }
@@ -340,7 +277,6 @@ cvs.addEventListener("touchstart", e => {
 
 cvs.addEventListener("touchmove", e => {
   if (!checkMobile() || (!mobileVerticalDrag && !mobileHorizontalDrag)) return;
-
   e.preventDefault();
   const touch = e.touches[0];
   const rect = cvs.getBoundingClientRect();
@@ -348,59 +284,33 @@ cvs.addEventListener("touchmove", e => {
   const currentTouchY = touch.clientY - rect.top;
 
   if (mobileVerticalDrag) {
-    // Vertical movement (existing logic)
     const deltaY = (currentTouchY - lastTouchY) * (550 / rect.height);
     mobileTextY = Math.max(50, Math.min(500, mobileTextY + deltaY));
-
-    // Update text area Y coordinates
     sy = mobileTextY - 30;
     ey = mobileTextY + 30;
-
     lastTouchY = currentTouchY;
   } else if (mobileHorizontalDrag) {
-    // Horizontal resizing (NEW FUNCTIONALITY)
     const deltaX = (currentTouchX - lastTouchX) * (900 / rect.width);
-
     if (horizontalDragSide === "left") {
-      // Dragging left edge
-      const newSx = sx + deltaX;
-      const minSx = 25; // Minimum left position
-      const maxSx = ex - 50; // Must maintain minimum 50px width
-
-      sx = Math.max(minSx, Math.min(maxSx, newSx));
+      sx = Math.max(25, Math.min(ex - 50, sx + deltaX));
     } else if (horizontalDragSide === "right") {
-      // Dragging right edge
-      const newEx = ex + deltaX;
-      const minEx = sx + 50; // Must maintain minimum 50px width
-      const maxEx = 875; // Maximum right position
-
-      ex = Math.max(minEx, Math.min(maxEx, newEx));
+      ex = Math.max(sx + 50, Math.min(875, ex + deltaX));
     }
-
     lastTouchX = currentTouchX;
   }
-
-  // Update preview
   preview();
 });
 
 cvs.addEventListener("touchend", e => {
   if (!checkMobile()) return;
-
   e.preventDefault();
-  mobileVerticalDrag = false;
-  mobileHorizontalDrag = false;
+  mobileVerticalDrag = mobileHorizontalDrag = false;
   horizontalDragSide = null;
   cvs.style.cursor = "grab";
 });
 
-/* 🖥️ DESKTOP: Normal drag rectangle */
 cvs.onmousedown = e => {
-  if (!img.src) return;
-
-  // Skip desktop dragging on mobile
-  if (checkMobile()) return;
-
+  if (!img.src || checkMobile()) return;
   drag = true;
   const r = cvs.getBoundingClientRect();
   sx = e.clientX - r.left;
@@ -416,23 +326,17 @@ cvs.onmousedown = e => {
 
 cvs.onmousemove = e => {
   if (!drag || checkMobile()) return;
-  const r = cvs.getBoundingClientRect();
-  ex = e.clientX - r.left;
-  ey = e.clientY - r.top;
+  ex = e.clientX - cvs.getBoundingClientRect().left;
+  ey = e.clientY - cvs.getBoundingClientRect().top;
   drawRect();
 };
 
 cvs.onmouseup = async () => {
   if (!drag || checkMobile()) return;
   drag = false;
-
-  // WAIT for fonts before drawing preview
   await forceLoadAllFonts();
-
   preview();
-  if (!step2) {
-    nextB.style.display = backB.style.display = "inline-block";
-  }
+  if (!step2) nextB.style.display = backB.style.display = "inline-block";
 };
 
 function drawRect() {
@@ -443,57 +347,41 @@ function drawRect() {
   ctx.strokeRect(sx, sy, ex - sx, ey - sy);
 }
 
-// 📱 UPDATED: Enhanced preview function with better visual indicators
 async function preview() {
   if (!sx || !ex) return;
-
-  // CRITICAL: Wait for fonts to load before drawing
-  if (!fontsLoaded) {
-    await forceLoadAllFonts();
-  }
+  if (!fontsLoaded) await forceLoadAllFonts();
 
   if (!checkMobile()) {
     drawRect();
   } else {
-    // Mobile: Just redraw image without rectangle
     ctx.clearRect(0, 0, 900, 550);
     ctx.drawImage(img, 0, 0, 900, 550);
   }
 
   const cx = (sx + ex) / 2,
     cy = (sy + ey) / 2;
-  const fam = fontSel.value;
-
-  // Set font with fallback
-  ctx.font = `${sizeSel.value}px "${fam}", Arial, sans-serif`;
+  ctx.font = `${sizeSel.value}px "${fontSel.value}", Arial, sans-serif`;
   ctx.fillStyle = colorIn.value;
   ctx.textAlign = "center";
   ctx.setLineDash([]);
   ctx.fillText("Your Name", cx, cy);
 
-  // 📱 ENHANCED: Mobile indicators with horizontal resize handles
   if (checkMobile()) {
-    // Main rectangle
     ctx.strokeStyle = "#1ec1cb";
     ctx.setLineDash([4]);
     ctx.strokeRect(sx, sy, ex - sx, ey - sy);
 
-    // Vertical drag arrows (existing)
     ctx.fillStyle = "#1ec1cb";
     ctx.font = "20px Arial";
     ctx.fillText("▲", cx + 100, sy - 10);
     ctx.fillText("▼", cx + 100, ey + 25);
 
-    // NEW: Horizontal resize handles
-    ctx.fillStyle = "#ff6b6b"; // Different color for horizontal handles
+    ctx.fillStyle = "#ff6b6b";
     ctx.font = "16px Arial";
-
-    // Left handle
     ctx.fillRect(sx - 3, sy, 6, ey - sy);
     ctx.fillStyle = "#1ec1cb";
     ctx.fillText("◀", sx - 15, cy + 5);
 
-    // Right handle
     ctx.fillStyle = "#ff6b6b";
     ctx.fillRect(ex - 3, sy, 6, ey - sy);
     ctx.fillStyle = "#1ec1cb";
@@ -501,7 +389,6 @@ async function preview() {
   }
 }
 
-/* Sort font dropdown alphabetically */
 (function sortFontDropdown() {
   const select = document.getElementById("font-style");
   const opts = Array.from(select.options);
@@ -509,9 +396,8 @@ async function preview() {
   opts.forEach(o => select.appendChild(o));
 })();
 
-/* nav */
 nextB.onclick = () => {
-  dragLi.textContent = "Select the names File,Font and Download settings below";
+  dragLi.textContent = "Select the output format and generate";
   setDiv.style.display = "block";
   downloadSettingsDiv.style.display = "block";
   nextB.style.display = "none";
@@ -520,7 +406,6 @@ nextB.onclick = () => {
   updateFormatDescription();
 };
 
-// 📱 UPDATED: Reset function with new horizontal defaults
 backB.onclick = () => {
   setDiv.style.display =
     downloadSettingsDiv.style.display =
@@ -530,200 +415,109 @@ backB.onclick = () => {
       "none";
   dragLi.textContent = "Or Drag & Drop your certificate template here";
   dragLi.style.display = "block";
-  dragLi.style.fontSize = "";
-  dragLi.style.paddingTop = "";
+  dragLi.style.fontSize = dragLi.style.paddingTop = "";
   upIn.hidden = upBtn.hidden = false;
   instr.style.display = "block";
   ctx.clearRect(0, 0, 900, 550);
   img = new Image();
-  upIn.value = "";
-  namesIn.value = "";
+  upIn.value = namesIn.value = "";
   step2 = false;
-
-  // 📱 UPDATED: Reset mobile state with new defaults
   mobileTextY = 275;
-  mobileVerticalDrag = false;
-  mobileHorizontalDrag = false;
+  mobileVerticalDrag = mobileHorizontalDrag = false;
   horizontalDragSide = null;
-  // Reset to new default horizontal values
   sx = 50;
   ex = 830;
 };
 
-/* live preview - WAIT for fonts */
-fontSel.onchange = async () => {
+fontSel.onchange = sizeSel.onchange = async () => {
   await forceLoadAllFonts();
   preview();
 };
-
-sizeSel.onchange = async () => {
-  await forceLoadAllFonts();
-  preview();
-};
-
 colorIn.onchange = preview;
 
-/* choose names file */
-fileB.onclick = () => namesIn.click();
-namesIn.onchange = async () => {
+/* UPDATED: Handle file selection and Void bypass logic securely */
+fileB.onclick = () => {
+  const format = document.querySelector('input[name="output-format"]:checked').value;
+  // If void, skip file upload and generate immediately
+  if (format === "void") {
+    generateCertificates(null, format);
+  } else {
+    namesIn.click(); // Open file browser for names
+  }
+};
+
+namesIn.onchange = () => {
   if (!namesIn.files.length) return;
+  const format = document.querySelector('input[name="output-format"]:checked').value;
+  generateCertificates(namesIn.files[0], format);
+  namesIn.value = ""; // Reset input
+};
+
+/* NEW: Refactored Generation Function */
+async function generateCertificates(namesFile, format) {
   if (!upIn.files.length) {
     alert("Upload a template first");
     return;
   }
 
-  const formatElement = document.querySelector('input[name="output-format"]:checked');
-  if (!formatElement) {
-    alert("Please select an output format");
-    return;
-  }
-
-  const format = formatElement.value;
-  fileB.textContent = format === "pdf" ? "Generating PDF..." : "Generating PNGs...";
+  const originalText = fileB.textContent;
+  fileB.textContent = "Generating...";
   fileB.disabled = true;
 
   try {
     const fd = new FormData();
     fd.append("template", upIn.files[0]);
-    fd.append("names", namesIn.files[0]);
+    if (namesFile) fd.append("names", namesFile);
     fd.append("font_style", fontSel.value);
     fd.append("font_size", sizeSel.value);
     fd.append("font_color", colorIn.value);
     fd.append("coords", [sx, sy, ex, ey].join(","));
     fd.append("output_format", format);
 
+    if (format === "void") {
+      const qty = document.getElementById("void-quantity").value;
+      fd.append("quantity", qty);
+    }
+
     const res = await fetch("/generate", { method: "POST", body: fd });
-    if (!res.ok) throw new Error(`Server ${res.status}`);
+    if (!res.ok) throw new Error(`Server returned ${res.status}`);
 
     const blob = await res.blob();
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
 
-    if (format === "pdf") {
+    if (format === "pdf" || format === "void") {
       a.download = "Certificates.pdf";
     } else {
       a.download = "Certificates.zip";
     }
 
     a.click();
-    namesIn.value = "";
   } catch (err) {
     alert("Error: " + err.message);
   }
 
-  fileB.textContent = format === "pdf" ? "Generate PDF" : "Generate PNGs";
+  fileB.textContent = originalText;
   fileB.disabled = false;
-};
+}
 
-/* ===== COMBINED MODAL & MOBILE MENU SYSTEM ===== */
+/* ===== COMBINED MODAL & MOBILE MENU SYSTEM (Optimized) ===== */
 document.addEventListener("DOMContentLoaded", function () {
-  // MODAL ELEMENTS
   const modalOverlay = document.getElementById("modal-overlay");
-  const modalContent = document.getElementById("modal-content");
   const modalBody = document.getElementById("modal-body");
-  const modalClose = document.getElementById("modal-close");
-
-  const aboutBtn = document.getElementById("about-btn");
-  const creatorsBtn = document.getElementById("creators-btn");
-  const projectsBtn = document.getElementById("projects-btn");
-  const contactBtn = document.getElementById("contact-btn");
-
-  // MOBILE MENU ELEMENTS
-  const hamburgerBtn = document.getElementById("hamburger-btn");
   const mobileMenu = document.getElementById("mobile-menu");
-  const mobileCloseBtn = document.getElementById("mobile-close-btn");
-  const mobileAbout = document.getElementById("mobile-about");
-  const mobileCreators = document.getElementById("mobile-creators");
-  const mobileProjects = document.getElementById("mobile-projects");
-  const mobileContact = document.getElementById("mobile-contact");
+  const hamburgerBtn = document.getElementById("hamburger-btn");
 
-  // MODAL CONTENT TEMPLATES
   const modalContents = {
-    about: `
-            <h2>About CertiHub</h2>
-            <p>🎓 <strong>CertiHub</strong> is a powerful, easy-to-use certificate generator that helps you create professional certificates in minutes!</p>
-            
-            <ul class="feature-list">
-                <li>Upload any certificate template</li>
-                <li>Drag and position text areas</li>
-                <li>Choose from 25+ professional fonts</li>
-                <li>Bulk generate certificates from CSV/TXT files</li>
-                <li>Export as PDF or PNG images</li>
-                <li>Mobile-friendly responsive design</li>
-                <li>Completely free to use</li>
-            </ul>
-            
-            <p>Perfect for schools, organizations, workshops, and events. Generate hundreds of certificates with just a few clicks!</p>
-            
-            <p><strong>Version:</strong> 2.0 | <strong>Last Updated:</strong> October 2025</p>
-        `,
-
-    creators: `
-            <h2>Meet the Creators</h2>
-            <p>CertiHub is proudly created by a passionate team of developers:</p>
-            
-            <div class="creator-card">
-                <div class="name">🚀 Development Team</div>
-                <div class="name">Mr Mueez Hajwani</div>
-                <div class="name">Mr Talha Siddique</div>
-                <div class="role">Full-Stack Developers</div>
-                <div class="bio">Passionate developers focused on creating useful tools that make certificate generation simple and efficient.</div>
-            </div>
-            
-            <div class="creator-card">
-                <div class="name">🎨 Design Team</div>
-                <div class="name">Mr Mueez Hajwani</div>
-                <div class="name">Mr Saeem Bijle</div>
-                <div class="role">UI/UX Designers</div>
-                <div class="bio">Crafting beautiful, intuitive interfaces that make complex tasks feel effortless.</div>
-            </div>
-            
-            <p>💝 Built with love using Flask, JavaScript, and modern web technologies.</p>
-            <p>🌟 Thank you for using CertiHub and supporting our work!</p>
-        `,
-
-    projects: `
-            <h2>Other Projects</h2>
-            <p>🚀 Explore more useful tools and projects:</p>
-            
-            <ul class="feature-list">
-                <li><strong>QR Generator Pro</strong> - Advanced QR code generator</li>
-            </ul>
-            
-            <p>🌐 More projects coming soon! Stay tuned for updates.</p>
-            <p>💡 Have an idea for a useful tool? Let us know!</p>
-        `,
-
-    contact: `
-            <h2>Get in Touch</h2>
-            <p>📬 We'd love to hear from you! Reach out for support, feedback, or collaboration:</p>
-            
-            <div class="creator-card">
-                <div class="name">📧 Email Support</div>
-                <div class="role">General Inquiries</div>
-                <div class="bio">23ds33@aiktc.ac.in<br>We typically respond within 24 hours</div>
-            </div>
-            
-            <div class="creator-card">
-                <div class="name">🐛 Bug Reports</div>
-                <div class="role">Technical Issues</div>
-                <div class="bio">23ds33@aiktc.ac.in<br>Help us improve CertiHub</div>
-            </div>
-            
-            <div class="creator-card">
-                <div class="name">💡 Feature Requests</div>
-                <div class="role">Suggestions & Ideas</div>
-                <div class="bio">23ds26@aiktc.ac.in<br>Share your ideas with us</div>
-            </div>
-            
-            <p>🌟 <strong>Love CertiHub?</strong> Share it with your friends and colleagues!</p>
-        `,
+    about: `<h2>About CertiHub</h2><p>🎓 <strong>CertiHub</strong> is a powerful, easy-to-use certificate generator...</p>`,
+    creators: `<h2>Meet the Creators</h2><div class="creator-card"><div class="name">🚀 Development Team</div>...</div>`,
+    projects: `<h2>Other Projects</h2><ul class="feature-list"><li><strong>QR Generator Pro</strong> - Advanced QR code generator</li></ul>`,
+    contact: `<h2>Get in Touch</h2><div class="creator-card"><div class="name">📧 Email Support</div>...</div>`,
   };
 
-  // MODAL FUNCTIONS
   function openModal(content) {
     if (modalBody && modalOverlay) {
-      modalBody.innerHTML = modalContents[content];
+      modalBody.innerHTML = modalContents[content] || "<p>Content coming soon!</p>";
       modalOverlay.classList.add("active");
       document.body.style.overflow = "hidden";
     }
@@ -736,108 +530,49 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  // MOBILE MENU FUNCTIONS
-  function closeMenu() {
+  function toggleMenu() {
     if (hamburgerBtn && mobileMenu) {
-      hamburgerBtn.classList.remove("active");
-      mobileMenu.classList.remove("active");
-      document.body.style.overflow = "auto";
+      const isActive = mobileMenu.classList.toggle("active");
+      hamburgerBtn.classList.toggle("active");
+      document.body.style.overflow = isActive ? "hidden" : "auto";
     }
   }
 
-  function openMenu() {
-    if (hamburgerBtn && mobileMenu) {
-      hamburgerBtn.classList.add("active");
-      mobileMenu.classList.add("active");
-      document.body.style.overflow = "hidden";
-    }
-  }
+  // Attach modal listeners efficiently
+  ["about", "creators", "projects", "contact"].forEach(id => {
+    const btn = document.getElementById(`${id}-btn`);
+    const mobileBtn = document.getElementById(`mobile-${id}`);
 
-  // CORNER BUTTON EVENT LISTENERS (Desktop)
-  if (aboutBtn) aboutBtn.addEventListener("click", () => openModal("about"));
-  if (creatorsBtn) creatorsBtn.addEventListener("click", () => openModal("creators"));
-  if (projectsBtn) projectsBtn.addEventListener("click", () => openModal("projects"));
-  if (contactBtn) contactBtn.addEventListener("click", () => openModal("contact"));
+    if (btn) btn.addEventListener("click", () => openModal(id));
+    if (mobileBtn)
+      mobileBtn.addEventListener("click", () => {
+        openModal(id);
+        toggleMenu();
+      });
+  });
 
-  // MODAL CLOSE EVENT LISTENERS
-  if (modalClose) modalClose.addEventListener("click", closeModal);
-  if (modalOverlay) {
-    modalOverlay.addEventListener("click", e => {
-      if (e.target === modalOverlay) {
-        closeModal();
-      }
-    });
-  }
+  document.getElementById("modal-close")?.addEventListener("click", closeModal);
+  modalOverlay?.addEventListener("click", e => {
+    if (e.target === modalOverlay) closeModal();
+  });
 
-  // HAMBURGER MENU EVENT LISTENERS
-  if (hamburgerBtn) {
-    hamburgerBtn.addEventListener("click", function (e) {
-      e.stopPropagation();
+  hamburgerBtn?.addEventListener("click", e => {
+    e.stopPropagation();
+    toggleMenu();
+  });
+  document.getElementById("mobile-close-btn")?.addEventListener("click", e => {
+    e.preventDefault();
+    e.stopPropagation();
+    toggleMenu();
+  });
+  mobileMenu?.addEventListener("click", e => {
+    if (e.target === mobileMenu) toggleMenu();
+  });
 
-      if (mobileMenu.classList.contains("active")) {
-        closeMenu();
-      } else {
-        openMenu();
-      }
-    });
-  }
-
-  // MOBILE CLOSE BUTTON
-  if (mobileCloseBtn) {
-    mobileCloseBtn.addEventListener("click", function (e) {
-      e.preventDefault();
-      e.stopPropagation();
-      closeMenu();
-    });
-  }
-
-  // MOBILE MENU BACKGROUND CLOSE
-  if (mobileMenu) {
-    mobileMenu.addEventListener("click", function (e) {
-      if (e.target === mobileMenu) {
-        closeMenu();
-      }
-    });
-  }
-
-  // MOBILE MENU ITEMS - NOW THEY CAN ACCESS openModal!
-  if (mobileAbout) {
-    mobileAbout.addEventListener("click", () => {
-      openModal("about");
-      closeMenu();
-    });
-  }
-
-  if (mobileCreators) {
-    mobileCreators.addEventListener("click", () => {
-      openModal("creators");
-      closeMenu();
-    });
-  }
-
-  if (mobileProjects) {
-    mobileProjects.addEventListener("click", () => {
-      openModal("projects");
-      closeMenu();
-    });
-  }
-
-  if (mobileContact) {
-    mobileContact.addEventListener("click", () => {
-      openModal("contact");
-      closeMenu();
-    });
-  }
-
-  // GLOBAL EVENT LISTENERS
   document.addEventListener("keydown", e => {
     if (e.key === "Escape") {
-      if (modalOverlay && modalOverlay.classList.contains("active")) {
-        closeModal();
-      }
-      if (mobileMenu && mobileMenu.classList.contains("active")) {
-        closeMenu();
-      }
+      if (modalOverlay?.classList.contains("active")) closeModal();
+      if (mobileMenu?.classList.contains("active")) toggleMenu();
     }
   });
 });
