@@ -496,16 +496,17 @@ h3 {
 }
 
 /* ==============================================
-   RIGHT SIDEBAR WRAPPER (Fixes Overlapping)
+   RIGHT SIDEBAR WRAPPER (Fixes Overlapping & Position)
    ============================================== */
 #right-sidebar {
   position: absolute;
-  left: 102%;
-  top: -4%;
+  /* Changed from 102% to calc(100% + 20px) to pull it leftwards closer to the canvas */
+  left: calc(100% + 20px);
+  top: 0;
   width: 220px;
   display: flex;
   flex-direction: column;
-  gap: 20px; /* This dynamically pushes the history box down! */
+  gap: 20px; /* Perfectly spaces the History Box directly below Download Settings */
   z-index: 10;
 }
 
