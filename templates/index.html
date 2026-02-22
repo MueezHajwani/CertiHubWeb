@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -178,9 +178,11 @@
 
       <div id="history-panel">
         <h3>Session History</h3>
-        <ul id="history-list"></ul>
+        <ul id="history-list">
+          </ul>
         <button id="merge-pdf-btn">Merge All PDFs</button>
       </div>
+
     </div>
 
     <div id="instruction-label">
@@ -192,6 +194,8 @@
       <input id="names-file" type="file" accept=".txt,.pdf,.xlsx" hidden />
       <button id="back-btn">Back</button>
     </div>
+    
+    <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
     <script src="/static/script.js"></script>
   </body>
 </html>

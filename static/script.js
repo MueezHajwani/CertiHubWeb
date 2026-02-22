@@ -16,11 +16,10 @@ const namesIn = document.getElementById("names-file");
 const formatDesc = document.getElementById("format-description");
 const voidContainer = document.getElementById("void-quantity-container");
 
-// NEW: History Variables
 const historyPanel = document.getElementById("history-panel");
 const historyList = document.getElementById("history-list");
 const mergeBtn = document.getElementById("merge-pdf-btn");
-let pdfSessionHistory = []; // Array to store generated PDFs in memory
+let pdfSessionHistory = [];
 
 let img = new Image(),
   drag = false,
@@ -29,8 +28,6 @@ let img = new Image(),
   sy,
   ex,
   ey;
-
-// 📱 Mobile-specific variables
 let isMobile = false;
 let mobileTextY = 275;
 let mobileVerticalDrag = false;
@@ -39,7 +36,6 @@ let horizontalDragSide = null;
 let lastTouchX = 0;
 let lastTouchY = 0;
 let edgeTouchZone = 30;
-
 let fontsLoaded = false;
 let fontsLoadingPromise = null;
 
@@ -53,7 +49,6 @@ window.addEventListener("resize", checkMobile);
 
 function forceLoadAllFonts() {
   if (fontsLoadingPromise) return fontsLoadingPromise;
-
   const fontList = [
     "Alex Brush",
     "Allura",
@@ -153,7 +148,6 @@ document.addEventListener("DOMContentLoaded", function () {
   updateFormatDescription();
 });
 
-/* ===== DRAG & DROP FUNCTIONALITY ===== */
 const canvasContainer = document.getElementById("canvas-container");
 const canvas = document.getElementById("template-canvas");
 const dragOverlay = document.getElementById("canvas-overlay");
@@ -292,11 +286,8 @@ cvs.addEventListener("touchmove", e => {
     lastTouchY = currentTouchY;
   } else if (mobileHorizontalDrag) {
     const deltaX = (currentTouchX - lastTouchX) * (900 / rect.width);
-    if (horizontalDragSide === "left") {
-      sx = Math.max(25, Math.min(ex - 50, sx + deltaX));
-    } else if (horizontalDragSide === "right") {
-      ex = Math.max(sx + 50, Math.min(875, ex + deltaX));
-    }
+    if (horizontalDragSide === "left") sx = Math.max(25, Math.min(ex - 50, sx + deltaX));
+    else if (horizontalDragSide === "right") ex = Math.max(sx + 50, Math.min(875, ex + deltaX));
     lastTouchX = currentTouchX;
   }
   preview();
@@ -352,9 +343,8 @@ async function preview() {
   if (!sx || !ex) return;
   if (!fontsLoaded) await forceLoadAllFonts();
 
-  if (!checkMobile()) {
-    drawRect();
-  } else {
+  if (!checkMobile()) drawRect();
+  else {
     ctx.clearRect(0, 0, 900, 550);
     ctx.drawImage(img, 0, 0, 900, 550);
   }
@@ -371,18 +361,15 @@ async function preview() {
     ctx.strokeStyle = "#1ec1cb";
     ctx.setLineDash([4]);
     ctx.strokeRect(sx, sy, ex - sx, ey - sy);
-
     ctx.fillStyle = "#1ec1cb";
     ctx.font = "20px Arial";
     ctx.fillText("▲", cx + 100, sy - 10);
     ctx.fillText("▼", cx + 100, ey + 25);
-
     ctx.fillStyle = "#ff6b6b";
     ctx.font = "16px Arial";
     ctx.fillRect(sx - 3, sy, 6, ey - sy);
     ctx.fillStyle = "#1ec1cb";
     ctx.fillText("◀", sx - 15, cy + 5);
-
     ctx.fillStyle = "#ff6b6b";
     ctx.fillRect(ex - 3, sy, 6, ey - sy);
     ctx.fillStyle = "#1ec1cb";
@@ -397,7 +384,7 @@ async function preview() {
   opts.forEach(o => select.appendChild(o));
 })();
 
-// NEW: Function to render History UI dynamically
+// UPDATED: Dynamically checks if button should be grayed out
 function updateHistoryUI() {
   if (!historyPanel || !historyList) return;
 
@@ -409,6 +396,13 @@ function updateHistoryUI() {
       li.textContent = `${index + 1}. ${item.name}`;
       historyList.appendChild(li);
     });
+
+    // Disable logic if less than 2 PDFs
+    if (pdfSessionHistory.length < 2) {
+      mergeBtn.disabled = true;
+    } else {
+      mergeBtn.disabled = false;
+    }
   } else {
     historyPanel.style.display = "none";
   }
@@ -422,7 +416,7 @@ nextB.onclick = () => {
   fileB.style.display = "inline-block";
   step2 = true;
   updateFormatDescription();
-  if (pdfSessionHistory.length > 0) historyPanel.style.display = "block"; // Show history if exists
+  if (pdfSessionHistory.length > 0) historyPanel.style.display = "block";
 };
 
 backB.onclick = () => {
@@ -432,7 +426,7 @@ backB.onclick = () => {
     fileB.style.display =
     backB.style.display =
       "none";
-  if (historyPanel) historyPanel.style.display = "none"; // Hide history on screen 1
+  if (historyPanel) historyPanel.style.display = "none";
   dragLi.textContent = "Or Drag & Drop your certificate template here";
   dragLi.style.display = "block";
   dragLi.style.fontSize = dragLi.style.paddingTop = "";
@@ -457,11 +451,8 @@ colorIn.onchange = preview;
 
 fileB.onclick = () => {
   const format = document.querySelector('input[name="output-format"]:checked').value;
-  if (format === "void") {
-    generateCertificates(null, format);
-  } else {
-    namesIn.click();
-  }
+  if (format === "void") generateCertificates(null, format);
+  else namesIn.click();
 };
 
 namesIn.onchange = () => {
@@ -471,13 +462,11 @@ namesIn.onchange = () => {
   namesIn.value = "";
 };
 
-// UPDATED: Generation Function with Memory Storage
 async function generateCertificates(namesFile, format) {
   if (!upIn.files.length) {
     alert("Upload a template first");
     return;
   }
-
   const originalText = fileB.textContent;
   fileB.textContent = "Generating...";
   fileB.disabled = true;
@@ -504,57 +493,56 @@ async function generateCertificates(namesFile, format) {
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
 
-    // Save to history memory if PDF
     if (format === "pdf" || format === "void") {
       a.download = "Certificates.pdf";
-
-      let docName = "";
-      if (format === "void") {
-        const qty = document.getElementById("void-quantity").value;
-        docName = `Blank x${qty} (Void)`;
-      } else {
-        docName = `${namesFile ? namesFile.name : "Names"} (Std)`;
-      }
-
+      let docName =
+        format === "void"
+          ? `Blank x${document.getElementById("void-quantity").value} (Void)`
+          : `${namesFile ? namesFile.name : "Names"} (Std)`;
       pdfSessionHistory.push({ name: docName, blob: blob });
-      updateHistoryUI(); // Refresh list
+      updateHistoryUI();
     } else {
       a.download = "Certificates.zip";
     }
-
     a.click();
   } catch (err) {
     alert("Error: " + err.message);
   }
-
   fileB.textContent = originalText;
   fileB.disabled = false;
 }
 
-// NEW: PDF Merge Submission logic
+// UPDATED: Client-Side Merging using PDF-lib to bypass Vercel 4.5MB limit
 if (mergeBtn) {
   mergeBtn.onclick = async () => {
-    if (pdfSessionHistory.length < 2) {
-      alert("You need at least 2 PDFs generated to merge them!");
-      return;
-    }
+    if (pdfSessionHistory.length < 2) return; // Prevent merging if less than 2
 
     const originalText = mergeBtn.textContent;
-    mergeBtn.textContent = "Merging...";
+    mergeBtn.textContent = "Merging locally...";
     mergeBtn.disabled = true;
 
     try {
-      const fd = new FormData();
-      pdfSessionHistory.forEach((item, index) => {
-        fd.append("pdfs", item.blob, `file_${index}.pdf`);
-      });
+      // Create a new blank PDF Document
+      const { PDFDocument } = PDFLib;
+      const mergedPdf = await PDFDocument.create();
 
-      const res = await fetch("/merge", { method: "POST", body: fd });
-      if (!res.ok) throw new Error(`Server returned ${res.status}`);
+      // Loop through the saved blobs in memory and copy them in
+      for (const item of pdfSessionHistory) {
+        const arrayBuffer = await item.blob.arrayBuffer();
+        const pdf = await PDFDocument.load(arrayBuffer);
+        const copiedPages = await mergedPdf.copyPages(pdf, pdf.getPageIndices());
+        copiedPages.forEach(page => {
+          mergedPdf.addPage(page);
+        });
+      }
 
-      const mergedBlob = await res.blob();
+      // Save the merged document
+      const mergedPdfBytes = await mergedPdf.save();
+
+      // Download it
+      const blob = new Blob([mergedPdfBytes], { type: "application/pdf" });
       const a = document.createElement("a");
-      a.href = URL.createObjectURL(mergedBlob);
+      a.href = URL.createObjectURL(blob);
       a.download = "Merged_Certificates.pdf";
       a.click();
     } catch (err) {
@@ -566,7 +554,6 @@ if (mergeBtn) {
   };
 }
 
-/* ===== COMBINED MODAL & MOBILE MENU SYSTEM ===== */
 document.addEventListener("DOMContentLoaded", function () {
   const modalOverlay = document.getElementById("modal-overlay");
   const modalBody = document.getElementById("modal-body");
@@ -606,7 +593,6 @@ document.addEventListener("DOMContentLoaded", function () {
   ["about", "creators", "projects", "contact"].forEach(id => {
     const btn = document.getElementById(`${id}-btn`);
     const mobileBtn = document.getElementById(`mobile-${id}`);
-
     if (btn) btn.addEventListener("click", () => openModal(id));
     if (mobileBtn)
       mobileBtn.addEventListener("click", () => {
@@ -619,7 +605,6 @@ document.addEventListener("DOMContentLoaded", function () {
   modalOverlay?.addEventListener("click", e => {
     if (e.target === modalOverlay) closeModal();
   });
-
   hamburgerBtn?.addEventListener("click", e => {
     e.stopPropagation();
     toggleMenu();
