@@ -500,20 +500,18 @@ h3 {
    ============================================== */
 #right-sidebar {
   position: absolute;
-  /* Changed from 102% to calc(100% + 20px) to pull it leftwards closer to the canvas */
   left: calc(100% + 20px);
   top: 0;
   width: 220px;
   display: flex;
   flex-direction: column;
-  gap: 20px; /* Perfectly spaces the History Box directly below Download Settings */
+  gap: 20px;
   z-index: 10;
 }
 
 /* ==============================================
   CLONED SETTINGS BLOCKS:
-  Both boxes now share identical sizing, 
-  background, borders, and padding!
+  Both boxes share identical sizing, background, borders
   ==============================================
 */
 #download-settings,
@@ -526,10 +524,9 @@ h3 {
   border-radius: 8px;
   text-align: center;
   box-shadow: 0 8px 32px rgba(30, 193, 203, 0.2);
-  box-sizing: border-box; /* Crucial to keep padding from stretching the width */
+  box-sizing: border-box;
 }
 
-/* Shared identical headings for both cloned boxes */
 #download-settings h3,
 #history-panel h3 {
   color: #1ec1cb;
@@ -689,7 +686,6 @@ h3 {
   transform: translateY(2px);
 }
 
-/* Gray-out effect when disabled */
 #merge-pdf-btn:disabled {
   background: #3a4a58;
   color: #8fa3b3;
@@ -700,14 +696,4 @@ h3 {
 
 #names-file {
   display: none;
-}
-
-/* Wrapper Mobile Support */
-@media screen and (max-width: 1024px) {
-  #right-sidebar {
-    position: static !important;
-    width: 100% !important;
-    max-width: 500px !important;
-    margin: 30px auto !important;
-  }
 }
