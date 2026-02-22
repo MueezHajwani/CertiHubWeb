@@ -257,21 +257,17 @@ h3 {
 
 .left-bottom {
   top: 20px;
-  /* Changed from 110px to 20px */
   left: 120px;
-  /* Changed from 20px to 110px */
 }
 
 /* Right Side Positioning - FIXED */
 .right-top {
   top: 20px;
   right: 120px;
-  /* Changed from 20px to 110px */
 }
 
 .right-bottom {
   top: 20px;
-  /* Changed from 110px to 20px */
   right: 20px;
 }
 
@@ -314,15 +310,10 @@ h3 {
   box-shadow: 0 10px 40px rgba(30, 193, 203, 0.2);
   -webkit-backdrop-filter: blur(3px);
   backdrop-filter: blur(20px);
-
-  /* Custom scrollbar styling */
   overflow-y: auto;
-  /* Firefox */
   -ms-overflow-style: none;
-  /* IE and Edge */
 }
 
-/* Hide scrollbar for webkit browsers */
 .modal-content::-webkit-scrollbar {
   width: 0px;
   background: transparent;
@@ -352,12 +343,8 @@ h3 {
   padding: 50px 35px 35px;
   color: white;
   line-height: 1.6;
-
-  /* Hide scrollbar but keep functionality */
   overflow-y: auto;
-  /* Firefox */
   -ms-overflow-style: none;
-  /* IE and Edge */
 }
 
 .modal-body::-webkit-scrollbar {
@@ -621,7 +608,7 @@ h3 {
   line-height: 1.4;
 }
 
-/* NEW: Void Quantity Settings Styling */
+/* Void Quantity Settings Styling */
 #void-quantity-container {
   display: none; /* Hidden by default until Void is selected */
   margin-top: 10px;
@@ -666,6 +653,87 @@ h3 {
   font-size: 12px;
   display: block;
   line-height: 1.4;
+}
+
+/* NEW: Session History Panel Styling */
+#history-panel {
+  display: none; /* Hidden by default */
+  position: absolute;
+  left: 102%;
+  top: 60%; /* Sits right beneath the download settings */
+  width: 220px;
+  background: #112e42;
+  padding: 10px;
+  border: 1px solid #1ec1cb;
+  border-radius: 8px;
+  text-align: center;
+  box-shadow: 0 8px 32px rgba(30, 193, 203, 0.2);
+}
+
+#history-panel h3 {
+  color: #1ec1cb;
+  font-size: 1.2rem;
+  margin-bottom: 10px;
+  border-bottom: 1px solid rgba(30, 193, 203, 0.3);
+  padding-bottom: 5px;
+}
+
+#history-list {
+  list-style: none;
+  padding: 0;
+  margin: 10px 0;
+  max-height: 150px;
+  overflow-y: auto;
+  text-align: left;
+}
+
+#history-list::-webkit-scrollbar {
+  width: 4px;
+}
+
+#history-list::-webkit-scrollbar-thumb {
+  background: #1ec1cb;
+  border-radius: 4px;
+}
+
+#history-list li {
+  font-size: 12px;
+  color: white;
+  padding: 8px 5px;
+  border-bottom: 1px solid rgba(30, 193, 203, 0.2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  background: rgba(255, 255, 255, 0.05);
+  margin-bottom: 5px;
+  border-radius: 4px;
+}
+
+#history-list li:last-child {
+  border-bottom: none;
+}
+
+#merge-pdf-btn {
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
+  font-size: 14px;
+  background: linear-gradient(135deg, #1ec1cb, #00a8ff);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: 0.3s;
+}
+
+#merge-pdf-btn:hover {
+  box-shadow: 0 4px 15px rgba(30, 193, 203, 0.5);
+  background: linear-gradient(135deg, #00a8ff, #8e44ad);
+}
+
+#merge-pdf-btn:active {
+  transform: translateY(2px);
 }
 
 /* Names file input */

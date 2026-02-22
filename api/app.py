@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, Response
 from PIL import Image, ImageDraw, ImageFont
-from pypdf import PdfReader
+from pypdf import PdfReader, PdfWriter  # NEW: Added PdfWriter for merging
 import pandas as pd
 import io, os, zipfile
 from functools import lru_cache
@@ -12,46 +12,44 @@ app = Flask(__name__,
 
 FONTS_DIR = os.path.join(os.path.dirname(__file__), '..', 'static', 'fonts')
 
-# Font mapping from Google Font names to local TTF files
 FONT_MAP = {
-    "Alex Brush": "AlexBrush.ttf",           # NEW (no spaces)
-    "Allura": "Allura.ttf",                  # NEW (no spaces)
+    "Alex Brush": "AlexBrush.ttf",
+    "Allura": "Allura.ttf",
     "Anton": "Anton.ttf",
     "Arimo": "Arimo.ttf",
     "Ballet": "Ballet.ttf",
-    "Bebas Neue": "Bebas Neue.ttf",          # EXISTING (has spaces)
-    "Bree Serif": "BreeSerif.ttf",           # NEW (no spaces)
+    "Bebas Neue": "Bebas Neue.ttf",
+    "Bree Serif": "BreeSerif.ttf",
     "Cabin": "Cabin.ttf",
-    "DM Sans": "DM Sans.ttf",                # EXISTING (has spaces)
-    "Fira Sans": "Fira Sans.ttf",            # EXISTING (has spaces)
-    "Great Vibes": "GreatVibes.ttf",         # NEW (no spaces)
+    "DM Sans": "DM Sans.ttf",
+    "Fira Sans": "Fira Sans.ttf",
+    "Great Vibes": "GreatVibes.ttf",
     "Heebo": "Heebo.ttf",
     "Inter": "Inter.ttf",
-    "Josefin Sans": "Josefin Sans.ttf",      # EXISTING (has spaces)
+    "Josefin Sans": "Josefin Sans.ttf",
     "Karla": "Karla.ttf",
     "Lato": "Lato.ttf",
-    "Libre Baskerville": "Libre Baskerville.ttf",  # EXISTING (has spaces)
+    "Libre Baskerville": "Libre Baskerville.ttf",
     "Merriweather": "Merriweather.ttf",
     "Montserrat": "Montserrat.ttf",
     "Mukta": "Mukta.ttf",
-    "Noto Sans": "Noto Sans.ttf",            # EXISTING (has spaces)
+    "Noto Sans": "Noto Sans.ttf",
     "Nunito": "Nunito.ttf",
-    "Open Sans": "Open Sans.ttf",            # EXISTING (has spaces)
+    "Open Sans": "Open Sans.ttf",
     "Orbitron": "Orbitron-VariableFont_wght.ttf",
     "Oswald": "Oswald.ttf",
-    "Pacifico": "Pacifico.ttf",              # NEW (no spaces)
-    "Playfair Display": "Playfair Display.ttf",  # EXISTING (has spaces)
+    "Pacifico": "Pacifico.ttf",
+    "Playfair Display": "Playfair Display.ttf",
     "Poppins": "Poppins.ttf",
-    "PT Sans": "PT Sans.ttf",                # EXISTING (has spaces)
+    "PT Sans": "PT Sans.ttf",
     "Raleway": "Raleway.ttf",
     "Righteous": "Righteous.ttf",
     "Roboto": "Roboto.ttf",
-    "Roboto Slab": "Roboto Slab.ttf",        # EXISTING (has spaces)
+    "Roboto Slab": "Roboto Slab.ttf",
     "Ubuntu": "Ubuntu.ttf",
-    "Work Sans": "Work Sans.ttf"             # EXISTING (has spaces)
+    "Work Sans": "Work Sans.ttf"
 }
 
-# Global font cache to store loaded fonts
 FONT_CACHE = {}
 
 def hex_to_rgb(code):
@@ -75,16 +73,13 @@ def read_names(fs):
 
 @lru_cache(maxsize=128)
 def get_font_path(font_name):
-    """Get font path with caching"""
     try:
-        # First try to get the TTF file from our font mapping
         if font_name in FONT_MAP:
             ttf_filename = FONT_MAP[font_name]
             font_path = os.path.join(FONTS_DIR, ttf_filename)
             if os.path.exists(font_path):
                 return font_path
         
-        # Fallback: try common variations
         possible_files = [
             f"{font_name}.ttf",
             f"{font_name.replace(' ', '')}.ttf",
@@ -97,27 +92,22 @@ def get_font_path(font_name):
             if os.path.exists(font_path):
                 return font_path
         
-        # Ultimate fallback: try any available font
         available_fonts = [f for f in os.listdir(FONTS_DIR) if f.endswith('.ttf')]
         if available_fonts:
             return os.path.join(FONTS_DIR, available_fonts[0])
         
         return None
-        
     except Exception as e:
         print(f"Font path error: {e}")
         return None
 
 def get_font(font_name, font_size):
-    """Get PIL font object with caching for faster loading"""
     cache_key = f"{font_name}_{font_size}"
-    
     if cache_key in FONT_CACHE:
         return FONT_CACHE[cache_key]
     
     try:
         font_path = get_font_path(font_name)
-        
         if font_path and os.path.exists(font_path):
             font = ImageFont.truetype(font_path, font_size)
         else:
@@ -125,7 +115,6 @@ def get_font(font_name, font_size):
         
         FONT_CACHE[cache_key] = font
         return font
-        
     except Exception as e:
         print(f"Font loading error: {e}")
         default_font = ImageFont.load_default()
@@ -133,16 +122,12 @@ def get_font(font_name, font_size):
         return default_font
 
 def preload_common_fonts():
-    """Preload commonly used fonts"""
     common_fonts = ["Anton", "Poppins", "Roboto", "Open Sans", "Lato"]
     common_sizes = [20, 30, 40, 50, 60]
-    
     for font_name in common_fonts:
         for size in common_sizes:
-            try:
-                get_font(font_name, size)
-            except:
-                pass
+            try: get_font(font_name, size)
+            except: pass
 
 @app.route("/")
 def index():
@@ -151,7 +136,6 @@ def index():
 
 @app.route("/preview-font", methods=["POST"])
 def preview_font():
-    """Fast font preview endpoint"""
     try:
         font_name = request.form.get("font_name", "Anton")
         font_size = int(request.form.get("font_size", 40))
@@ -162,12 +146,10 @@ def preview_font():
 
 @app.route('/debug-fonts')
 def debug_fonts():
-    # Debugging route omitted for brevity (kept your existing logic)
     pass
 
 @app.route('/fonts/<filename>')
 def serve_font(filename):
-    """Direct font serving route as backup"""
     try:
         font_path = os.path.join(FONTS_DIR, filename)
         if os.path.exists(font_path) and filename.endswith('.ttf'):
@@ -180,26 +162,58 @@ def serve_font(filename):
     except Exception as e:
         return Response(f"Error serving font: {e}", 500)
 
+
+# ==========================================
+# NEW: PDF MERGING ROUTE
+# ==========================================
+@app.route("/merge", methods=["POST"])
+def merge_pdfs():
+    try:
+        print("=== Merge route started ===")
+        uploaded_files = request.files.getlist("pdfs")
+        
+        if not uploaded_files:
+            return Response("No PDFs uploaded for merging", 400)
+            
+        merger = PdfWriter()
+        
+        for pdf_file in uploaded_files:
+            # Append each file stream to the merger
+            merger.append(io.BytesIO(pdf_file.read()))
+            
+        merged_pdf = io.BytesIO()
+        merger.write(merged_pdf)
+        merged_pdf.seek(0)
+        
+        print("PDFs merged successfully")
+        return Response(merged_pdf.getvalue(), mimetype="application/pdf",
+                        headers={"Content-Disposition": "attachment; filename=Merged_Certificates.pdf"})
+                        
+    except Exception as e:
+        print(f"Error in merge route: {str(e)}")
+        return Response(f"Server Error during merge: {str(e)}", 500)
+
+
+# ==========================================
+# EXISTING: GENERATION ROUTE
+# ==========================================
 @app.route("/generate", methods=["POST"])
 def generate():
     try:
         print("=== Generate route started ===")
         
-        # 1. Base Template Validation
         if "template" not in request.files:
             return Response("No template file uploaded", 400)
             
         tpl_f = request.files["template"]
         output_format = request.form.get("output_format", "pdf")
-        print(f"Format requested: {output_format}")
-
-        # 2. Process template image
+        
         print("Processing base template...")
         tpl = Image.open(io.BytesIO(tpl_f.read())).convert("RGB")
         ow, oh = tpl.size
 
         # ----------------------------------------------------
-        # NEW: VOID LOGIC (Bypass name parsing entirely)
+        # VOID LOGIC (Bypass name parsing)
         # ----------------------------------------------------
         if output_format == "void":
             quantity = int(request.form.get("quantity", 5))
@@ -220,7 +234,7 @@ def generate():
                           headers={"Content-Disposition": "attachment; filename=Blank_Certificates.pdf"})
 
         # ----------------------------------------------------
-        # ORIGINAL LOGIC: Text Rendering (Requires names file)
+        # STANDARD LOGIC: Text Rendering
         # ----------------------------------------------------
         if "names" not in request.files:
             return Response("No names file uploaded", 400)
@@ -234,15 +248,11 @@ def generate():
         sx, sy, ex, ey = map(float, coords.split(","))
         cx, cy = ((sx+ex)/2)*(ow/900), ((sy+ey)/2)*(oh/550)
 
-        # Read names
         names = read_names(names_f)
         if not names:
             return Response("No names found in uploaded file", 400)
         
-        # Load font
         font = get_font(fname, fsize)
-
-        # Generate images
         images = []
         for i, name in enumerate(names):
             img = tpl.copy()
@@ -250,7 +260,6 @@ def generate():
             images.append((img, name))
 
         if output_format == "png":
-            # PNG ZIP generation
             zip_buffer = io.BytesIO()
             with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_STORED) as zip_file:
                 filename_counts = {}
@@ -278,7 +287,6 @@ def generate():
             )
         
         else:
-            # Standard PDF Generation
             pdf_images = [img for img, name in images]
             pdf = io.BytesIO()
             if pdf_images:

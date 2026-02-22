@@ -14,7 +14,13 @@ const colorIn = document.getElementById("font-color");
 const fileB = document.getElementById("file-upload-btn");
 const namesIn = document.getElementById("names-file");
 const formatDesc = document.getElementById("format-description");
-const voidContainer = document.getElementById("void-quantity-container"); // NEW
+const voidContainer = document.getElementById("void-quantity-container");
+
+// NEW: History Variables
+const historyPanel = document.getElementById("history-panel");
+const historyList = document.getElementById("history-list");
+const mergeBtn = document.getElementById("merge-pdf-btn");
+let pdfSessionHistory = []; // Array to store generated PDFs in memory
 
 let img = new Image(),
   drag = false,
@@ -112,7 +118,6 @@ function forceLoadAllFonts() {
   }
 }
 
-/* fill size dropdown */
 for (let i = 1; i <= 120; i++) {
   const o = document.createElement("option");
   o.value = i;
@@ -121,7 +126,6 @@ for (let i = 1; i <= 120; i++) {
   sizeSel.appendChild(o);
 }
 
-/* UPDATED: Handle Void UI changes */
 function updateFormatDescription() {
   const selectedFormat = document.querySelector('input[name="output-format"]:checked');
   if (!selectedFormat) return;
@@ -137,7 +141,7 @@ function updateFormatDescription() {
   } else if (selectedFormat.value === "void") {
     formatDesc.textContent = "Multiple blank certificates in a single PDF";
     if (fileB) fileB.textContent = "Generate Blank Templates";
-    if (voidContainer) voidContainer.style.display = "block"; // Show quantity input
+    if (voidContainer) voidContainer.style.display = "block";
   }
 }
 
@@ -234,10 +238,7 @@ function setupMobileMode() {
 
 function showDropSuccess() {
   const successMsg = document.createElement("div");
-  successMsg.innerHTML = `
-    <div style="position: absolute; top: 10px; right: 10px; background: #1ec1cb; color: white; padding: 8px 12px; border-radius: 5px; font-size: 12px; z-index: 100;">
-      ✅ Template uploaded successfully!
-    </div>`;
+  successMsg.innerHTML = `<div style="position: absolute; top: 10px; right: 10px; background: #1ec1cb; color: white; padding: 8px 12px; border-radius: 5px; font-size: 12px; z-index: 100;">✅ Template uploaded successfully!</div>`;
   canvasContainer.appendChild(successMsg);
   setTimeout(() => {
     if (successMsg.parentNode) successMsg.parentNode.removeChild(successMsg);
@@ -396,6 +397,23 @@ async function preview() {
   opts.forEach(o => select.appendChild(o));
 })();
 
+// NEW: Function to render History UI dynamically
+function updateHistoryUI() {
+  if (!historyPanel || !historyList) return;
+
+  if (pdfSessionHistory.length > 0) {
+    historyPanel.style.display = "block";
+    historyList.innerHTML = "";
+    pdfSessionHistory.forEach((item, index) => {
+      const li = document.createElement("li");
+      li.textContent = `${index + 1}. ${item.name}`;
+      historyList.appendChild(li);
+    });
+  } else {
+    historyPanel.style.display = "none";
+  }
+}
+
 nextB.onclick = () => {
   dragLi.textContent = "Select the output format and generate";
   setDiv.style.display = "block";
@@ -404,6 +422,7 @@ nextB.onclick = () => {
   fileB.style.display = "inline-block";
   step2 = true;
   updateFormatDescription();
+  if (pdfSessionHistory.length > 0) historyPanel.style.display = "block"; // Show history if exists
 };
 
 backB.onclick = () => {
@@ -413,6 +432,7 @@ backB.onclick = () => {
     fileB.style.display =
     backB.style.display =
       "none";
+  if (historyPanel) historyPanel.style.display = "none"; // Hide history on screen 1
   dragLi.textContent = "Or Drag & Drop your certificate template here";
   dragLi.style.display = "block";
   dragLi.style.fontSize = dragLi.style.paddingTop = "";
@@ -435,14 +455,12 @@ fontSel.onchange = sizeSel.onchange = async () => {
 };
 colorIn.onchange = preview;
 
-/* UPDATED: Handle file selection and Void bypass logic securely */
 fileB.onclick = () => {
   const format = document.querySelector('input[name="output-format"]:checked').value;
-  // If void, skip file upload and generate immediately
   if (format === "void") {
     generateCertificates(null, format);
   } else {
-    namesIn.click(); // Open file browser for names
+    namesIn.click();
   }
 };
 
@@ -450,10 +468,10 @@ namesIn.onchange = () => {
   if (!namesIn.files.length) return;
   const format = document.querySelector('input[name="output-format"]:checked').value;
   generateCertificates(namesIn.files[0], format);
-  namesIn.value = ""; // Reset input
+  namesIn.value = "";
 };
 
-/* NEW: Refactored Generation Function */
+// UPDATED: Generation Function with Memory Storage
 async function generateCertificates(namesFile, format) {
   if (!upIn.files.length) {
     alert("Upload a template first");
@@ -486,8 +504,20 @@ async function generateCertificates(namesFile, format) {
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
 
+    // Save to history memory if PDF
     if (format === "pdf" || format === "void") {
       a.download = "Certificates.pdf";
+
+      let docName = "";
+      if (format === "void") {
+        const qty = document.getElementById("void-quantity").value;
+        docName = `Blank x${qty} (Void)`;
+      } else {
+        docName = `${namesFile ? namesFile.name : "Names"} (Std)`;
+      }
+
+      pdfSessionHistory.push({ name: docName, blob: blob });
+      updateHistoryUI(); // Refresh list
     } else {
       a.download = "Certificates.zip";
     }
@@ -501,7 +531,42 @@ async function generateCertificates(namesFile, format) {
   fileB.disabled = false;
 }
 
-/* ===== COMBINED MODAL & MOBILE MENU SYSTEM (Optimized) ===== */
+// NEW: PDF Merge Submission logic
+if (mergeBtn) {
+  mergeBtn.onclick = async () => {
+    if (pdfSessionHistory.length < 2) {
+      alert("You need at least 2 PDFs generated to merge them!");
+      return;
+    }
+
+    const originalText = mergeBtn.textContent;
+    mergeBtn.textContent = "Merging...";
+    mergeBtn.disabled = true;
+
+    try {
+      const fd = new FormData();
+      pdfSessionHistory.forEach((item, index) => {
+        fd.append("pdfs", item.blob, `file_${index}.pdf`);
+      });
+
+      const res = await fetch("/merge", { method: "POST", body: fd });
+      if (!res.ok) throw new Error(`Server returned ${res.status}`);
+
+      const mergedBlob = await res.blob();
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(mergedBlob);
+      a.download = "Merged_Certificates.pdf";
+      a.click();
+    } catch (err) {
+      alert("Merge Error: " + err.message);
+    }
+
+    mergeBtn.textContent = originalText;
+    mergeBtn.disabled = false;
+  };
+}
+
+/* ===== COMBINED MODAL & MOBILE MENU SYSTEM ===== */
 document.addEventListener("DOMContentLoaded", function () {
   const modalOverlay = document.getElementById("modal-overlay");
   const modalBody = document.getElementById("modal-body");
@@ -538,7 +603,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  // Attach modal listeners efficiently
   ["about", "creators", "projects", "contact"].forEach(id => {
     const btn = document.getElementById(`${id}-btn`);
     const mobileBtn = document.getElementById(`mobile-${id}`);
