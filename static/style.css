@@ -93,7 +93,6 @@ h3 {
   display: none;
 }
 
-/* Drag and Drop Hint */
 #drag-drop-hint {
   text-align: center;
   margin-top: 8px;
@@ -157,20 +156,17 @@ h3 {
   color: #00a8ff;
   font-weight: bold;
 }
-
 .drag-message i {
   font-size: 48px;
   display: block;
   margin-bottom: 10px;
   filter: drop-shadow(0 4px 8px rgba(30, 193, 203, 0.3));
 }
-
 .drag-message p {
   font-size: 18px;
   margin: 10px 0 5px 0;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
-
 .drag-message small {
   font-size: 12px;
   opacity: 0.8;
@@ -189,7 +185,6 @@ h3 {
   color: #1ec1cb;
   font-weight: bold;
 }
-
 #button-container {
   margin-top: 13px;
   text-align: center;
@@ -235,7 +230,6 @@ h3 {
   font-size: 22px;
   margin-bottom: 3px;
 }
-
 .corner-button span {
   font-size: 11px;
   text-transform: uppercase;
@@ -332,7 +326,6 @@ h3 {
   overflow-y: auto;
   -ms-overflow-style: none;
 }
-
 .modal-body::-webkit-scrollbar {
   width: 0px;
   background: transparent;
@@ -353,7 +346,6 @@ h3 {
   margin-bottom: 18px;
   font-size: 16px;
 }
-
 .modal-body .feature-list {
   list-style: none;
   padding: 0;
@@ -383,12 +375,10 @@ h3 {
   border: 1px solid rgba(30, 193, 203, 0.2);
   transition: all 0.3s ease;
 }
-
 .creator-card:hover {
   background: rgba(30, 193, 203, 0.15);
   transform: translateY(-2px);
 }
-
 .creator-card .name {
   font-size: 1.3rem;
   font-weight: bold;
@@ -448,13 +438,11 @@ h3 {
   box-shadow: 0 8px 25px rgba(30, 193, 203, 0.5);
   background: linear-gradient(135deg, #00a8ff, #8e44ad);
 }
-
 #next-btn:hover::before,
 #back-btn:hover::before,
 #file-upload-btn:hover::before {
   left: 100%;
 }
-
 #next-btn:active,
 #back-btn:active,
 #file-upload-btn:active {
@@ -492,14 +480,12 @@ h3 {
   font-size: 14px;
   border: 1px solid #00a8ff;
 }
-
 #settings select:focus,
 #settings input:focus {
   outline: none;
   border-color: #1ec1cb;
   box-shadow: 0 0 10px rgba(30, 193, 203, 0.3);
 }
-
 #settings h3 {
   margin-bottom: 10px;
   color: #1ec1cb;
@@ -509,12 +495,23 @@ h3 {
   pointer-events: none;
 }
 
-#download-settings {
-  display: none;
+/* ==============================================
+   NEW: RIGHT SIDEBAR WRAPPER (Fixes Overlapping)
+   ============================================== */
+#right-sidebar {
   position: absolute;
   left: 102%;
   top: -4%;
   width: 220px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px; /* This dynamically pushes the history box down! */
+  z-index: 10;
+}
+
+#download-settings {
+  display: none;
+  width: 100%;
   background: #112e42;
   padding: 10px;
   border: 1px solid #1ec1cb;
@@ -544,9 +541,8 @@ h3 {
   transition: background-color 0.3s ease;
   text-align: left;
 }
-
 .radio-option:hover {
-  background-color: rgba(30, 193, 203, 0.1);
+  background: rgba(30, 193, 203, 0.1);
 }
 .radio-option input[type="radio"] {
   display: none;
@@ -561,12 +557,10 @@ h3 {
   transition: all 0.3s ease;
   flex-shrink: 0;
 }
-
 .radio-option input[type="radio"]:checked + .radio-custom {
   border-color: #00a8ff;
   background: linear-gradient(135deg, #1ec1cb, #00a8ff);
 }
-
 .radio-option input[type="radio"]:checked + .radio-custom::after {
   content: "";
   position: absolute;
@@ -578,7 +572,6 @@ h3 {
   background: white;
   border-radius: 50%;
 }
-
 .radio-text {
   font-size: 14px;
   color: white;
@@ -592,7 +585,6 @@ h3 {
   text-align: left;
   padding: 0 8px;
 }
-
 #void-quantity-container label {
   font-size: 14px;
   color: #1ec1cb;
@@ -600,7 +592,6 @@ h3 {
   margin-bottom: 5px;
   font-weight: 600;
 }
-
 #void-quantity {
   background: lightgray;
   width: 100%;
@@ -610,7 +601,6 @@ h3 {
   border: 1px solid #00a8ff;
   transition: all 0.3s ease;
 }
-
 #void-quantity:focus {
   outline: none;
   border-color: #1ec1cb;
@@ -623,7 +613,6 @@ h3 {
   padding-top: 10px;
   border-top: 1px solid rgba(30, 193, 203, 0.3);
 }
-
 #format-description {
   color: #1ec1cb;
   font-style: italic;
@@ -635,10 +624,7 @@ h3 {
 /* SESSION HISTORY PANEL */
 #history-panel {
   display: none;
-  position: absolute;
-  left: 102%;
-  top: 260px; /* NEW: Fixed pixel distance from top to ensure it NEVER touches download-settings */
-  width: 220px;
+  width: 100%;
   background: #112e42;
   padding: 10px;
   border: 1px solid #1ec1cb;
@@ -663,7 +649,6 @@ h3 {
   overflow-y: auto;
   text-align: left;
 }
-
 #history-list::-webkit-scrollbar {
   width: 4px;
 }
@@ -671,7 +656,6 @@ h3 {
   background: #1ec1cb;
   border-radius: 4px;
 }
-
 #history-list li {
   font-size: 12px;
   color: white;
@@ -684,7 +668,6 @@ h3 {
   margin-bottom: 5px;
   border-radius: 4px;
 }
-
 #history-list li:last-child {
   border-bottom: none;
 }
@@ -702,17 +685,15 @@ h3 {
   font-weight: bold;
   transition: 0.3s;
 }
-
 #merge-pdf-btn:hover:not(:disabled) {
   box-shadow: 0 4px 15px rgba(30, 193, 203, 0.5);
   background: linear-gradient(135deg, #00a8ff, #8e44ad);
 }
-
 #merge-pdf-btn:active:not(:disabled) {
   transform: translateY(2px);
 }
 
-/* NEW: Style for deactivated/grayed-out Merge button */
+/* Gray-out effect when disabled */
 #merge-pdf-btn:disabled {
   background: #3a4a58;
   color: #8fa3b3;
@@ -723,4 +704,14 @@ h3 {
 
 #names-file {
   display: none;
+}
+
+/* Wrapper Mobile Support */
+@media screen and (max-width: 1024px) {
+  #right-sidebar {
+    position: static !important;
+    width: 100% !important;
+    max-width: 500px !important;
+    margin: 30px auto !important;
+  }
 }
