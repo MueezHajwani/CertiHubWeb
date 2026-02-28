@@ -591,6 +591,12 @@ async function generateCertificates(namesFile, format) {
         const res = await fetch("/generate", { method: "POST", body: fd });
         if (!res.ok) throw new Error(`Failed on batch ${i + 1}`);
         blobs.push(await res.blob());
+
+        // NEW: 1.5-second cooldown to let Vercel clear its memory!
+        if (i < totalChunks - 1) {
+          fileB.textContent = `Cooling down server...`;
+          await new Promise(resolve => setTimeout(resolve, 1500));
+        }
       }
 
       fileB.textContent = "Merging final files...";
