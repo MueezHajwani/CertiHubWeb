@@ -649,20 +649,48 @@ h3 {
   background: #1ec1cb;
   border-radius: 4px;
 }
+
+/* UPDATED: History List Items styling to handle X button cleanly */
 #history-list li {
   font-size: 12px;
   color: white;
-  padding: 8px 5px;
+  padding: 8px 8px;
   border-bottom: 1px solid rgba(30, 193, 203, 0.2);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
   background: rgba(255, 255, 255, 0.05);
   margin-bottom: 5px;
   border-radius: 4px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 #history-list li:last-child {
   border-bottom: none;
+}
+
+/* NEW: Ensures the text truncates without pushing the X button out */
+.history-item-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex-grow: 1;
+  min-width: 0;
+  margin-right: 10px;
+}
+
+/* NEW: Styles for the X remove button */
+.remove-pdf-btn {
+  flex-shrink: 0;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  line-height: 1;
+}
+.remove-pdf-btn:hover {
+  color: #ff4757; /* Turns red */
+  text-shadow: 0 0 8px rgba(255, 71, 87, 0.6); /* Adds a subtle glow */
+  transform: scale(1.2);
 }
 
 #merge-pdf-btn {

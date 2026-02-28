@@ -384,24 +384,47 @@ async function preview() {
   opts.forEach(o => select.appendChild(o));
 })();
 
-// UPDATED: Dynamically checks if button should be grayed out
+// UPDATED: Renders list with functional X button
 function updateHistoryUI() {
   if (!historyPanel || !historyList) return;
 
   if (pdfSessionHistory.length > 0) {
     historyPanel.style.display = "block";
     historyList.innerHTML = "";
+
     pdfSessionHistory.forEach((item, index) => {
       const li = document.createElement("li");
-      li.textContent = `${index + 1}. ${item.name}`;
+
+      // Wrap text in a span to handle truncation properly
+      const textSpan = document.createElement("span");
+      textSpan.className = "history-item-text";
+      textSpan.textContent = `${index + 1}. ${item.name}`;
+      textSpan.title = item.name; // Shows full name on hover
+
+      // Create the clickable remove "X" button
+      const removeBtn = document.createElement("span");
+      removeBtn.className = "remove-pdf-btn";
+      removeBtn.innerHTML = "&times;";
+      removeBtn.title = "Remove PDF";
+
+      // Remove logic
+      removeBtn.onclick = () => {
+        pdfSessionHistory.splice(index, 1); // Remove this item from array
+        updateHistoryUI(); // Re-render the whole list
+      };
+
+      li.appendChild(textSpan);
+      li.appendChild(removeBtn);
       historyList.appendChild(li);
     });
 
-    // Disable logic if less than 2 PDFs
+    // Disable merge logic if less than 2 PDFs
     if (pdfSessionHistory.length < 2) {
       mergeBtn.disabled = true;
+      mergeBtn.textContent = "Need 2+ PDFs to Merge";
     } else {
       mergeBtn.disabled = false;
+      mergeBtn.textContent = "Merge All PDFs";
     }
   } else {
     historyPanel.style.display = "none";
@@ -512,21 +535,19 @@ async function generateCertificates(namesFile, format) {
   fileB.disabled = false;
 }
 
-// UPDATED: Client-Side Merging using PDF-lib to bypass Vercel 4.5MB limit
+// Client-Side Merging using PDF-lib
 if (mergeBtn) {
   mergeBtn.onclick = async () => {
-    if (pdfSessionHistory.length < 2) return; // Prevent merging if less than 2
+    if (pdfSessionHistory.length < 2) return;
 
     const originalText = mergeBtn.textContent;
     mergeBtn.textContent = "Merging locally...";
     mergeBtn.disabled = true;
 
     try {
-      // Create a new blank PDF Document
       const { PDFDocument } = PDFLib;
       const mergedPdf = await PDFDocument.create();
 
-      // Loop through the saved blobs in memory and copy them in
       for (const item of pdfSessionHistory) {
         const arrayBuffer = await item.blob.arrayBuffer();
         const pdf = await PDFDocument.load(arrayBuffer);
@@ -536,10 +557,8 @@ if (mergeBtn) {
         });
       }
 
-      // Save the merged document
       const mergedPdfBytes = await mergedPdf.save();
 
-      // Download it
       const blob = new Blob([mergedPdfBytes], { type: "application/pdf" });
       const a = document.createElement("a");
       a.href = URL.createObjectURL(blob);
