@@ -597,7 +597,7 @@ async function generateCertificates(namesFile, format) {
         fd.append("output_format", format);
 
         const res = await fetch("/generate", { method: "POST", body: fd });
-        if (!res.ok) throw new Error(`Failed on batch ${i + 1}`);
+        if (!res.ok) throw new Error(`Failed on Batch ${i + 1}`);
         blobs.push(await res.blob());
 
         // UPDATED: Smart Cooldown Logic (Triggers based on cooldownFrequency)
