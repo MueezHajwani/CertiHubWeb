@@ -538,7 +538,7 @@ async function generateCertificates(namesFile, format) {
 
     // 3. THRESHOLD CHECKS
     const threshold = format === "pdf" ? 150 : 50;
-    const chunkSize = format === "pdf" ? 40 : 25;
+    const chunkSize = format === "pdf" ? 20 : 20;
 
     // SCENARIO A: FAST LANE (Process all at once)
     if (namesList.length <= threshold) {

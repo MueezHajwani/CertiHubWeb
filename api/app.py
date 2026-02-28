@@ -4,6 +4,7 @@ from pypdf import PdfReader, PdfWriter
 import pandas as pd
 import io, os, zipfile, json
 from functools import lru_cache
+import gc
 
 # IMPORTANT: Configure paths for Vercel
 app = Flask(__name__, 
@@ -307,6 +308,14 @@ def generate():
                     append_images=pdf_images[1:] if len(pdf_images) > 1 else None,
                     optimize=True
                 )
+            
+            # --- NEW: AGGRESSIVE MEMORY CLEARING ---
+            del images
+            del pdf_images
+            del tpl
+            gc.collect() 
+            # ---------------------------------------
+
             pdf.seek(0)
             return Response(pdf.getvalue(), mimetype="application/pdf",
                           headers={"Content-Disposition": "attachment; filename=Certificates.pdf"})
