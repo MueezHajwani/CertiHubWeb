@@ -541,7 +541,7 @@ async function generateCertificates(namesFile, format) {
 
     // 3. THRESHOLD CHECKS
     const threshold = format === "pdf" ? 150 : 50;
-    const chunkSize = format === "pdf" ? 50 : 20;
+    const chunkSize = format === "pdf" ? 100 : 20;
 
     // NEW: SMART COOLDOWN FREQUENCY (Dependent on Chunk Size)
     // Formula calculates how many batches safely fit into the 100-image limit.
