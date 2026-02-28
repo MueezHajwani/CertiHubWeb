@@ -482,6 +482,9 @@ namesIn.onchange = () => {
 // ==========================================
 // ADAPTIVE BATCH GENERATION LOGIC
 // ==========================================
+// ==========================================
+// ADAPTIVE BATCH GENERATION LOGIC
+// ==========================================
 async function generateCertificates(namesFile, format) {
   if (!upIn.files.length) {
     alert("Upload a template first");
@@ -540,6 +543,11 @@ async function generateCertificates(namesFile, format) {
     const threshold = format === "pdf" ? 150 : 50;
     const chunkSize = format === "pdf" ? 50 : 20;
 
+    // NEW: SMART COOLDOWN FREQUENCY (Dependent on Chunk Size)
+    // Formula calculates how many batches safely fit into the 100-image limit.
+    const safeMemoryLimit = 100;
+    const cooldownFrequency = Math.max(1, Math.floor(safeMemoryLimit / chunkSize));
+
     // SCENARIO A: FAST LANE (Process all at once)
     if (namesList.length <= threshold) {
       fileB.textContent = "Generating...";
@@ -592,8 +600,8 @@ async function generateCertificates(namesFile, format) {
         if (!res.ok) throw new Error(`Failed on batch ${i + 1}`);
         blobs.push(await res.blob());
 
-        // NEW: 1.5-second cooldown to let Vercel clear its memory!
-        if (i < totalChunks - 1) {
+        // UPDATED: Smart Cooldown Logic (Triggers based on cooldownFrequency)
+        if ((i + 1) % cooldownFrequency === 0 && i < totalChunks - 1) {
           fileB.textContent = `Cooling down server...`;
           await new Promise(resolve => setTimeout(resolve, 1500));
         }
