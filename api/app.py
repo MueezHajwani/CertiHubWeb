@@ -1,8 +1,8 @@
 from flask import Flask, render_template, request, Response
 from PIL import Image, ImageDraw, ImageFont
-from pypdf import PdfReader, PdfWriter  # NEW: Added PdfWriter for merging
+from pypdf import PdfReader, PdfWriter  
 import pandas as pd
-import io, os, zipfile
+import io, os, zipfile, json
 from functools import lru_cache
 
 # IMPORTANT: Configure paths for Vercel
@@ -164,44 +164,53 @@ def serve_font(filename):
 
 
 # ==========================================
-# NEW: PDF MERGING ROUTE
+# NEW: EXTRACT NAMES ROUTE (For Chunking logic)
+# ==========================================
+@app.route("/extract-names", methods=["POST"])
+def extract_names():
+    try:
+        if "names" not in request.files:
+            return Response("No names file uploaded", 400)
+        
+        names = read_names(request.files["names"])
+        return {"names": names}
+    except Exception as e:
+        print(f"Error extracting names: {e}")
+        return Response(str(e), 500)
+
+
+# ==========================================
+# EXISTING: PDF MERGING ROUTE
 # ==========================================
 @app.route("/merge", methods=["POST"])
 def merge_pdfs():
     try:
-        print("=== Merge route started ===")
         uploaded_files = request.files.getlist("pdfs")
-        
         if not uploaded_files:
             return Response("No PDFs uploaded for merging", 400)
             
         merger = PdfWriter()
-        
         for pdf_file in uploaded_files:
-            # Append each file stream to the merger
             merger.append(io.BytesIO(pdf_file.read()))
             
         merged_pdf = io.BytesIO()
         merger.write(merged_pdf)
         merged_pdf.seek(0)
         
-        print("PDFs merged successfully")
         return Response(merged_pdf.getvalue(), mimetype="application/pdf",
                         headers={"Content-Disposition": "attachment; filename=Merged_Certificates.pdf"})
                         
     except Exception as e:
-        print(f"Error in merge route: {str(e)}")
         return Response(f"Server Error during merge: {str(e)}", 500)
 
 
 # ==========================================
-# EXISTING: GENERATION ROUTE
+# UPDATED: GENERATION ROUTE
 # ==========================================
 @app.route("/generate", methods=["POST"])
 def generate():
     try:
         print("=== Generate route started ===")
-        
         if "template" not in request.files:
             return Response("No template file uploaded", 400)
             
@@ -213,12 +222,10 @@ def generate():
         ow, oh = tpl.size
 
         # ----------------------------------------------------
-        # VOID LOGIC (Bypass name parsing)
+        # VOID LOGIC
         # ----------------------------------------------------
         if output_format == "void":
             quantity = int(request.form.get("quantity", 5))
-            print(f"Generating {quantity} blank templates...")
-            
             pdf = io.BytesIO()
             pdf_images = [tpl.copy() for _ in range(quantity)]
             
@@ -234,12 +241,19 @@ def generate():
                           headers={"Content-Disposition": "attachment; filename=Blank_Certificates.pdf"})
 
         # ----------------------------------------------------
-        # STANDARD LOGIC: Text Rendering
+        # SMART BATCH LOGIC
         # ----------------------------------------------------
-        if "names" not in request.files:
-            return Response("No names file uploaded", 400)
+        names = []
+        if "names_list" in request.form:
+            # Reconstruct list from JSON string (chunked requests)
+            names = json.loads(request.form.get("names_list"))
+        elif "names" in request.files:
+            # Read straight from the file (standard requests)
+            names = read_names(request.files["names"])
             
-        names_f = request.files["names"]
+        if not names:
+            return Response("No names provided", 400)
+            
         fname = request.form.get("font_style", "Anton")
         fsize = int(request.form.get("font_size", 40))
         fcolor = hex_to_rgb(request.form.get("font_color", "#000000"))
@@ -248,22 +262,20 @@ def generate():
         sx, sy, ex, ey = map(float, coords.split(","))
         cx, cy = ((sx+ex)/2)*(ow/900), ((sy+ey)/2)*(oh/550)
 
-        names = read_names(names_f)
-        if not names:
-            return Response("No names found in uploaded file", 400)
-        
         font = get_font(fname, fsize)
         images = []
-        for i, name in enumerate(names):
+        for name in names:
             img = tpl.copy()
             ImageDraw.Draw(img).text((cx, cy), name, font=font, fill=fcolor, anchor="mm")
             images.append((img, name))
+
+        start_index = int(request.form.get("start_index", 0))
 
         if output_format == "png":
             zip_buffer = io.BytesIO()
             with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_STORED) as zip_file:
                 filename_counts = {}
-                for i, (img, name) in enumerate(images, 1):
+                for i, (img, name) in enumerate(images, start_index + 1):
                     clean_name = "".join(c for c in name if c.isalnum() or c in (' ', '-', '_')).strip()
                     if not clean_name:
                         clean_name = f"Certificate_{i}"

@@ -384,7 +384,6 @@ async function preview() {
   opts.forEach(o => select.appendChild(o));
 })();
 
-// UPDATED: Renders list with functional X button
 function updateHistoryUI() {
   if (!historyPanel || !historyList) return;
 
@@ -394,23 +393,19 @@ function updateHistoryUI() {
 
     pdfSessionHistory.forEach((item, index) => {
       const li = document.createElement("li");
-
-      // Wrap text in a span to handle truncation properly
       const textSpan = document.createElement("span");
       textSpan.className = "history-item-text";
       textSpan.textContent = `${index + 1}. ${item.name}`;
-      textSpan.title = item.name; // Shows full name on hover
+      textSpan.title = item.name;
 
-      // Create the clickable remove "X" button
       const removeBtn = document.createElement("span");
       removeBtn.className = "remove-pdf-btn";
       removeBtn.innerHTML = "&times;";
       removeBtn.title = "Remove PDF";
 
-      // Remove logic
       removeBtn.onclick = () => {
-        pdfSessionHistory.splice(index, 1); // Remove this item from array
-        updateHistoryUI(); // Re-render the whole list
+        pdfSessionHistory.splice(index, 1);
+        updateHistoryUI();
       };
 
       li.appendChild(textSpan);
@@ -418,7 +413,6 @@ function updateHistoryUI() {
       historyList.appendChild(li);
     });
 
-    // Disable merge logic if less than 2 PDFs
     if (pdfSessionHistory.length < 2) {
       mergeBtn.disabled = true;
       mergeBtn.textContent = "Need 2+ PDFs to Merge";
@@ -485,57 +479,162 @@ namesIn.onchange = () => {
   namesIn.value = "";
 };
 
+// ==========================================
+// ADAPTIVE BATCH GENERATION LOGIC
+// ==========================================
 async function generateCertificates(namesFile, format) {
   if (!upIn.files.length) {
     alert("Upload a template first");
     return;
   }
   const originalText = fileB.textContent;
-  fileB.textContent = "Generating...";
   fileB.disabled = true;
 
   try {
-    const fd = new FormData();
-    fd.append("template", upIn.files[0]);
-    if (namesFile) fd.append("names", namesFile);
-    fd.append("font_style", fontSel.value);
-    fd.append("font_size", sizeSel.value);
-    fd.append("font_color", colorIn.value);
-    fd.append("coords", [sx, sy, ex, ey].join(","));
-    fd.append("output_format", format);
-
+    // 1. VOID LOGIC (No chunking needed, executes fast)
     if (format === "void") {
-      const qty = document.getElementById("void-quantity").value;
-      fd.append("quantity", qty);
-    }
+      fileB.textContent = "Generating...";
+      const fd = new FormData();
+      fd.append("template", upIn.files[0]);
+      fd.append("font_style", fontSel.value);
+      fd.append("font_size", sizeSel.value);
+      fd.append("font_color", colorIn.value);
+      fd.append("coords", [sx, sy, ex, ey].join(","));
+      fd.append("output_format", format);
+      fd.append("quantity", document.getElementById("void-quantity").value);
 
-    const res = await fetch("/generate", { method: "POST", body: fd });
-    if (!res.ok) throw new Error(`Server returned ${res.status}`);
+      const res = await fetch("/generate", { method: "POST", body: fd });
+      if (!res.ok) throw new Error(`Server returned ${res.status}`);
 
-    const blob = await res.blob();
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-
-    if (format === "pdf" || format === "void") {
+      const blob = await res.blob();
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
       a.download = "Certificates.pdf";
-      let docName =
-        format === "void"
-          ? `Blank x${document.getElementById("void-quantity").value} (Void)`
-          : `${namesFile ? namesFile.name : "Names"} (Std)`;
+
+      let docName = `Blank x${document.getElementById("void-quantity").value} (Void)`;
       pdfSessionHistory.push({ name: docName, blob: blob });
       updateHistoryUI();
-    } else {
-      a.download = "Certificates.zip";
+      a.click();
+
+      fileB.textContent = originalText;
+      fileB.disabled = false;
+      return;
     }
-    a.click();
+
+    // 2. NAME EXTRACTION
+    fileB.textContent = "Reading names...";
+    const extractFd = new FormData();
+    extractFd.append("names", namesFile);
+
+    const extractRes = await fetch("/extract-names", { method: "POST", body: extractFd });
+    if (!extractRes.ok) throw new Error("Failed to read names file.");
+
+    const extractData = await extractRes.json();
+    const namesList = extractData.names;
+
+    if (!namesList || namesList.length === 0) {
+      throw new Error("No names found in the uploaded file.");
+    }
+
+    // 3. THRESHOLD CHECKS
+    const threshold = format === "pdf" ? 120 : 40;
+    const chunkSize = format === "pdf" ? 50 : 25;
+
+    // SCENARIO A: FAST LANE (Process all at once)
+    if (namesList.length <= threshold) {
+      fileB.textContent = "Generating...";
+      const fd = new FormData();
+      fd.append("template", upIn.files[0]);
+      fd.append("names_list", JSON.stringify(namesList));
+      fd.append("font_style", fontSel.value);
+      fd.append("font_size", sizeSel.value);
+      fd.append("font_color", colorIn.value);
+      fd.append("coords", [sx, sy, ex, ey].join(","));
+      fd.append("output_format", format);
+
+      const res = await fetch("/generate", { method: "POST", body: fd });
+      if (!res.ok) throw new Error(`Server returned ${res.status}`);
+
+      const blob = await res.blob();
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+
+      if (format === "pdf") {
+        a.download = "Certificates.pdf";
+        pdfSessionHistory.push({ name: `${namesFile.name} (Std)`, blob: blob });
+        updateHistoryUI();
+      } else {
+        a.download = "Certificates.zip";
+      }
+      a.click();
+    }
+
+    // SCENARIO B: BATCH PROCESSING (Avoids Vercel Limits)
+    else {
+      let blobs = [];
+      const totalChunks = Math.ceil(namesList.length / chunkSize);
+
+      for (let i = 0; i < totalChunks; i++) {
+        fileB.textContent = `Processing batch ${i + 1} of ${totalChunks}...`;
+        const chunk = namesList.slice(i * chunkSize, (i + 1) * chunkSize);
+
+        const fd = new FormData();
+        fd.append("template", upIn.files[0]);
+        fd.append("names_list", JSON.stringify(chunk));
+        fd.append("start_index", i * chunkSize);
+        fd.append("font_style", fontSel.value);
+        fd.append("font_size", sizeSel.value);
+        fd.append("font_color", colorIn.value);
+        fd.append("coords", [sx, sy, ex, ey].join(","));
+        fd.append("output_format", format);
+
+        const res = await fetch("/generate", { method: "POST", body: fd });
+        if (!res.ok) throw new Error(`Failed on batch ${i + 1}`);
+        blobs.push(await res.blob());
+      }
+
+      fileB.textContent = "Merging final files...";
+
+      let finalBlob;
+      if (format === "pdf") {
+        const { PDFDocument } = PDFLib;
+        const mergedPdf = await PDFDocument.create();
+        for (const b of blobs) {
+          const arrBuf = await b.arrayBuffer();
+          const pdfDoc = await PDFDocument.load(arrBuf);
+          const copiedPages = await mergedPdf.copyPages(pdfDoc, pdfDoc.getPageIndices());
+          copiedPages.forEach(p => mergedPdf.addPage(p));
+        }
+        const mergedBytes = await mergedPdf.save();
+        finalBlob = new Blob([mergedBytes], { type: "application/pdf" });
+
+        pdfSessionHistory.push({ name: `${namesFile.name} (Std)`, blob: finalBlob });
+        updateHistoryUI();
+      } else {
+        // Zip Merge
+        const masterZip = new JSZip();
+        for (const b of blobs) {
+          const chunkZip = await JSZip.loadAsync(b);
+          chunkZip.forEach((relativePath, zipEntry) => {
+            masterZip.file(relativePath, zipEntry.async("blob"));
+          });
+        }
+        finalBlob = await masterZip.generateAsync({ type: "blob" });
+      }
+
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(finalBlob);
+      a.download = format === "pdf" ? "Certificates.pdf" : "Certificates.zip";
+      a.click();
+    }
   } catch (err) {
     alert("Error: " + err.message);
   }
+
   fileB.textContent = originalText;
   fileB.disabled = false;
 }
 
-// Client-Side Merging using PDF-lib
 if (mergeBtn) {
   mergeBtn.onclick = async () => {
     if (pdfSessionHistory.length < 2) return;
