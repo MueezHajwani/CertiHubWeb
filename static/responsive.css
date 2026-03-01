@@ -1002,9 +1002,27 @@ html {
    TABLET/DESKTOP TRANSITION (769px to 1023px)
    ========================================================================== */
 @media screen and (min-width: 769px) and (max-width: 1023px) {
+  body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    min-height: 100vh;
+  }
+  h1 {
+    font-size: 2.5rem;
+    margin: 10px 0;
+  }
+  #template-upload-container {
+    margin: 10px 0 20px 0;
+  }
+
+  /* Make canvas responsive for medium screens */
   #template-canvas {
-    width: 900px !important;
-    height: 550px !important;
+    width: 100% !important;
+    max-width: 700px !important;
+    height: auto !important;
+    aspect-ratio: 900 / 550;
     background: #2b2b2b;
     border: 2px solid white;
     border-radius: 8px;
@@ -1012,15 +1030,77 @@ html {
     margin: 0 auto;
   }
   #canvas-container {
-    margin-top: 10px;
+    position: relative;
+    margin: 10px auto;
+    width: 100%;
+    max-width: 700px;
     text-align: center;
+  }
+
+  /* Sidebars don't fit absolute left/right here, so stack them elegantly below */
+  #settings,
+  #right-sidebar {
+    position: relative !important;
+    display: inline-block !important;
+    width: 48% !important;
+    max-width: 340px !important;
+    vertical-align: top;
+    margin: 20px 1% 0 1% !important;
+    left: auto !important;
+    right: auto !important;
+    top: auto !important;
+  }
+  #settings {
+    padding: 20px !important;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  }
+  #right-sidebar {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 15px;
+  }
+  #download-settings,
+  #history-panel {
+    width: 100% !important;
+    padding: 20px !important;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  }
+  #button-container {
+    margin: 20px 0;
+    display: flex;
+    gap: 15px;
+    justify-content: center;
   }
 }
 
 /* ==========================================================================
-   DESKTOP / LAPTOP (1024px and above)
+   DESKTOP / LAPTOP / TV (1024px and above)
    ========================================================================== */
 @media screen and (min-width: 1024px) {
+  body {
+    /* Forces the single-page application feel */
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0; /* Removed padding to save space */
+    margin: 0;
+    overflow-x: hidden;
+  }
+
+  h1 {
+    font-size: 2.2rem; /* Slightly smaller to save vertical space */
+    margin: 2px 0 0px 0;
+  }
+
+  #template-upload-container {
+    margin: 0 0 10px 0; /* Tightened gap above canvas */
+  }
+
+  /* HARDCODED CANVAS SIZE AS REQUESTED */
   #template-canvas {
     width: 900px !important;
     height: 550px !important;
@@ -1032,37 +1112,41 @@ html {
     display: block;
     margin: 0 auto;
   }
+
   #canvas-container {
     position: relative;
     display: inline-block;
-    margin-top: 10px;
-    max-width: none;
+    margin: 0 auto;
+    width: 900px; /* Lock container to canvas width */
     text-align: center;
   }
 
-  /* Absolute positioned sidebars */
+  /* Dynamically stick sidebars to the canvas */
   #settings,
   #right-sidebar {
     position: absolute !important;
-    width: 220px !important;
-    max-width: 220px !important;
+    width: 240px !important;
+    max-width: 240px !important;
     margin: 0 !important;
-  }
-
-  #settings {
-    left: -280px !important;
-    top: -15px !important;
-  }
-
-  #right-sidebar {
-    left: calc(100% + 20px) !important;
     top: 0 !important;
+  }
+
+  /* Settings attaches to the LEFT of the canvas */
+  #settings {
+    right: calc(100% + 20px) !important; /* 20px gap from canvas */
+    left: auto !important;
+  }
+
+  /* Download/History attaches to the RIGHT of the canvas */
+  #right-sidebar {
+    left: calc(100% + 20px) !important; /* 20px gap from canvas */
+    right: auto !important;
     display: flex !important;
     flex-direction: column !important;
-    gap: 20px !important;
+    gap: 15px !important;
   }
 
-  /* Undo absolute overrides for children inside the wrapper */
+  /* Remove absolute overrides for children inside the wrapper */
   #download-settings,
   #history-panel {
     position: relative !important;
@@ -1073,5 +1157,20 @@ html {
     top: auto !important;
     bottom: auto !important;
     margin: 0 !important;
+  }
+
+  #instruction-label {
+    margin: 10px 0 5px 0; /* Tightened gap below canvas */
+  }
+
+  #button-container {
+    margin: 5px 0 10px 0;
+    display: flex;
+    gap: 15px;
+  }
+
+  #button-container button {
+    padding: 10px 30px; /* Slightly thinner buttons to save vertical space */
+    font-size: 16px;
   }
 }

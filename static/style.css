@@ -19,34 +19,67 @@ h1 {
   font-weight: bold;
   text-shadow: 0 4px 8px rgba(30, 193, 203, 0.3);
   letter-spacing: 3px;
-  margin: 20px 0;
+  /* margin: 30px 0 40px 0; */
   position: relative;
 }
 
-h1::after {
+/* h1::after has been completely removed to bypass the WebKit background-clip bug */
+
+h3 {
+  font-size: 1.5rem;
+  margin-bottom: 15px;
+}
+#template-upload-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px; /* REDUCED: Brings the button and text closer together */
+  margin-bottom: 25px;
+}
+#template-upload-container {
+  /* Added position: relative to hold the newly moved underline */
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  margin-bottom: 25px;
+}
+
+/* NEW: The glowing line is now attached here, safely outside the h1 text mask */
+#template-upload-container::before {
   content: "";
   position: absolute;
-  bottom: -10px;
+  top: 5px; /* Changed from -20px: pulls the line down away from the text */
   left: 50%;
   transform: translateX(-50%);
-  width: 200px;
+
+  /* --- RESPONSIVE WIDTH VARIANTS (Uncomment the one you want to use) --- */
+
+  /* Variant 1: Strict Viewport Width (Scales perfectly with screen width) */
+  /* width: 12vw; */
+
+  /* Variant 2: Font-Relative (Scales based on the font size of the root element) */
+  /* width: 15rem; */
+
+  /* Variant 3 (Recommended): The 'Clamp' Method. 
+     This acts like a rubber band. It sets a preferred size of 15vw, but guarantees 
+     it will never shrink smaller than 150px or grow wider than 250px. */
+  width: clamp(150px, 15vw, 250px);
+
+  /* --------------------------------------------------------------------- */
+
   height: 3px;
   background: linear-gradient(90deg, #1ec1cb, #00a8ff);
   border-radius: 2px;
   box-shadow: 0 2px 10px rgba(30, 193, 203, 0.5);
 }
 
-h3 {
-  font-size: 1.5rem;
-  margin-bottom: 15px;
-}
-
-#template-upload-container {
-  height: 70px;
-  margin-bottom: 10px;
-}
-
 #template-upload-btn {
+  margin-top: 18px; /* NEW: Pushes the button down away from the glowing line */
   padding: 10px 20px;
   font-size: 16px;
   width: 200px;
@@ -95,7 +128,7 @@ h3 {
 
 #drag-drop-hint {
   text-align: center;
-  margin-top: 8px;
+  margin: 0px 0 10px 0; /* REDUCED: Removed the top margin to close the gap */
   font-size: 16px;
   font-weight: bold;
   color: #1ec1cb;
@@ -105,7 +138,7 @@ h3 {
 #canvas-container {
   position: relative;
   display: inline-block;
-  margin-top: 10px;
+  margin-top: 20px;
 }
 
 #template-canvas {
@@ -650,7 +683,7 @@ h3 {
   border-radius: 4px;
 }
 
-/* UPDATED: History List Items styling to handle X button cleanly */
+/* History List Items styling to handle X button cleanly */
 #history-list li {
   font-size: 12px;
   color: white;
@@ -667,7 +700,7 @@ h3 {
   border-bottom: none;
 }
 
-/* NEW: Ensures the text truncates without pushing the X button out */
+/* Ensures the text truncates without pushing the X button out */
 .history-item-text {
   white-space: nowrap;
   overflow: hidden;
@@ -677,7 +710,7 @@ h3 {
   margin-right: 10px;
 }
 
-/* NEW: Styles for the X remove button */
+/* Styles for the X remove button */
 .remove-pdf-btn {
   flex-shrink: 0;
   color: rgba(255, 255, 255, 0.5);
@@ -688,8 +721,8 @@ h3 {
   line-height: 1;
 }
 .remove-pdf-btn:hover {
-  color: #ff4757; /* Turns red */
-  text-shadow: 0 0 8px rgba(255, 71, 87, 0.6); /* Adds a subtle glow */
+  color: #ff4757;
+  text-shadow: 0 0 8px rgba(255, 71, 87, 0.6);
   transform: scale(1.2);
 }
 
